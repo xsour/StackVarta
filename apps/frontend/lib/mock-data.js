@@ -51,22 +51,40 @@ export const categories = [
 
 export const authors = [
   {
+    id: 1,
     slug: 'oleh-koval',
     name: 'Олег Коваль',
-    bio: 'Frontend інженер. Пише про SSR, структуру сторінок і якісний користувацький досвід.',
-    avatarUrl: '/author-avatar.svg'
+    fullName: 'Олег Миколайович Коваль',
+    bio: 'Frontend-інженер з 8-річним досвідом. Спеціалізується на побудові високонавантажених інтерфейсів з використанням React та Next.js. Активно впроваджує практики технічного SEO та Core Web Vitals.',
+    avatarUrl: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/oleh-koval',
+      github: 'https://github.com/oleh-koval'
+    }
   },
   {
+    id: 2,
     slug: 'iryna-hnatiuk',
     name: 'Ірина Гнатюк',
-    bio: 'Backend інженерка. Пише про API, PostgreSQL та стабільну серверну архітектуру.',
-    avatarUrl: '/author-avatar.svg'
+    fullName: 'Ірина Василівна Гнатюк',
+    bio: 'Backend-розробниця, експертка з PostgreSQL та системного дизайну. Працює над оптимізацією запитів та масштабуванням мікросервісів. Регулярна спікерка на профільних конференціях.',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/iryna-hnatiuk',
+      github: 'https://github.com/iryna-hnatiuk'
+    }
   },
   {
+    id: 3,
     slug: 'maksym-bondar',
     name: 'Максим Бондар',
-    bio: 'DevOps інженер і технічний редактор. Пише про deployment, домени та технічне SEO.',
-    avatarUrl: '/author-avatar.svg'
+    fullName: 'Максим Артемович Бондар',
+    bio: 'DevOps-інженер та системний адміністратор. Захоплюється автоматизацією процесів деплою, безпекою хмарних інфраструктур та моніторингом систем у реальному часі.',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/maksym-bondar',
+      github: 'https://github.com/maksym-bondar'
+    }
   }
 ];
 
@@ -236,6 +254,7 @@ export const articles = articleSeeds.map((seed, index) => ({
     ...categoryParagraphs[seed.categorySlug]
   ].join('\n\n'),
   publishedAt: publishedDates[index],
+  updatedAt: publishedDates[index],
   views: 120 + index * 17,
   metaTitle: `${seed.title} | IT Blog`,
   metaDescription: seed.excerpt
@@ -348,4 +367,28 @@ export function searchArticles(query) {
 
     return haystack.includes(normalized);
   });
+}
+
+export const aboutData = {
+  title: 'Про нас | IT Blog',
+  name: 'IT Blog',
+  description: 'IT Blog - це профільне видання для розробників, інженерів та tech-ентузіастів. Ми розповідаємо про frontend, backend, DevOps, штучний інтелект та кібербезпеку.',
+  mission: 'Наша місія - створювати якісний україномовний контент, що допомагає IT-фахівцям зростати професійно, впроваджувати найкращі практики та залишатись у курсі сучасних технологій. Ми пишемо без води та клікбейту, зосереджуючись на практичному досвіді.',
+  contacts: {
+    email: 'hello@itblog.example.com'
+  },
+  socialLinks: [
+    { name: 'Twitter', url: 'https://twitter.com/itblog' },
+    { name: 'GitHub', url: 'https://github.com/itblog' },
+    { name: 'LinkedIn', url: 'https://linkedin.com/company/itblog' }
+  ],
+  foundedDate: '2025-01-15'
+};
+
+export function getAboutData() {
+  return aboutData;
+}
+
+export function getArticleCountByAuthor(slug) {
+  return articles.filter((article) => article.authorSlug === slug).length;
 }

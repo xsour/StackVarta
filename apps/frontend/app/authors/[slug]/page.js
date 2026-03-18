@@ -53,13 +53,38 @@ export default async function AuthorPage(props) {
           <Image
             src={author.avatarUrl || '/author-avatar.svg'}
             alt={author.name}
-            width={96}
-            height={96}
+            width={120}
+            height={120}
+            className="author-avatar"
+            style={{ borderRadius: '50%', objectFit: 'cover' }}
           />
           <div>
-            <p className="eyebrow">Автор</p>
-            <h1>{author.name}</h1>
-            <p className="muted">{author.bio}</p>
+            <p className="eyebrow">Автор профілю</p>
+            <h1>{author.fullName || author.name}</h1>
+            <p className="muted" style={{ fontSize: '1.1rem', marginBottom: '16px' }}>
+              {author.bio}
+            </p>
+            
+            <div className="author-meta-footer" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center' }}>
+              <div className="stats">
+                <strong>{author.totalArticles || 0}</strong> <span className="muted">статей опубліковано</span>
+              </div>
+              
+              {author.socials && (
+                <div className="social-links" style={{ display: 'flex', gap: '12px' }}>
+                  {author.socials.linkedin && (
+                    <a href={author.socials.linkedin} target="_blank" rel="noopener noreferrer" className="pill">
+                      LinkedIn
+                    </a>
+                  )}
+                  {author.socials.github && (
+                    <a href={author.socials.github} target="_blank" rel="noopener noreferrer" className="pill">
+                      GitHub
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

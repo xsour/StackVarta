@@ -176,7 +176,9 @@ img {
   padding: 24px;
 }
 
-.muted {
+.muted,
+.content,
+.details-list {
   color: var(--muted);
 }
 

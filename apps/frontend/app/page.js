@@ -14,7 +14,8 @@ export const metadata = {
   }
 };
 
-export default async function HomePage({ searchParams }) {
+export default async function HomePage(props) {
+  const searchParams = await props.searchParams;
   const category = searchParams?.category || '';
   const page = Math.max(1, Number(searchParams?.page || 1) || 1);
   const { items, meta, categories } = await getHomePageData({ page, category });
