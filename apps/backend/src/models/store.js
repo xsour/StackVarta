@@ -9,6 +9,7 @@ const { AppError } = require('../utils/app-error');
 const { createSlug } = require('../utils/slug');
 
 const MIGRATION_PATH = path.join(__dirname, '..', '..', 'migrations', '001_init.sql');
+const MIGRATION_PATH_002 = path.join(__dirname, '..', '..', 'migrations', '002_authors_and_site_settings.sql');
 
 let pool;
 let dbMode = 'memory';
@@ -82,11 +83,11 @@ function normalizeTagIds(value) {
   if (typeof value === 'string' && value.trim()) {
     return [
       ...new Set(
-        value
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean)
-          .map((item) => parseInteger(item, 'tagId'))
+          value
+              .split(',')
+              .map((item) => item.trim())
+              .filter(Boolean)
+              .map((item) => parseInteger(item, 'tagId'))
       )
     ];
   }
@@ -103,7 +104,15 @@ function sanitizeUserRow(row) {
     slug: row.slug,
     email: row.email,
     bio: row.bio,
+    fullName: row.full_name || null,
     avatarUrl: row.avatar_url,
+    linkedinUrl: row.linkedin_url || null,
+    githubUrl: row.github_url || null,
+    // структура socials — для сумісності з фронтендом
+    socials: {
+      linkedin: row.linkedin_url || null,
+      github: row.github_url || null
+    },
     isAdmin: Boolean(row.is_admin),
     createdAt: row.created_at
   };
@@ -150,24 +159,27 @@ function mapArticleRow(row, tags = []) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     author: row.author_join_id
-      ? {
+        ? {
           id: row.author_join_id,
           name: row.author_name,
           slug: row.author_slug,
           bio: row.author_bio,
           avatarUrl: row.author_avatar_url,
+          fullName: row.author_full_name || null,
+          linkedinUrl: row.author_linkedin_url || null,
+          githubUrl: row.author_github_url || null,
           email: row.author_email,
           isAdmin: Boolean(row.author_is_admin)
         }
-      : null,
+        : null,
     category: row.category_join_id
-      ? {
+        ? {
           id: row.category_join_id,
           name: row.category_name,
           slug: row.category_slug,
           description: row.category_description
         }
-      : null,
+        : null,
     tags,
     tagIds: tags.map((tag) => tag.id)
   };
@@ -207,14 +219,17 @@ function getArticleSelect() {
       u.email AS author_email,
       u.bio AS author_bio,
       u.avatar_url AS author_avatar_url,
+      u.full_name AS author_full_name,
+      u.linkedin_url AS author_linkedin_url,
+      u.github_url AS author_github_url,
       u.is_admin AS author_is_admin,
       c.id AS category_join_id,
       c.name AS category_name,
       c.slug AS category_slug,
       c.description AS category_description
     FROM articles a
-    LEFT JOIN users u ON u.id = a.author_id
-    LEFT JOIN categories c ON c.id = a.category_id
+           LEFT JOIN users u ON u.id = a.author_id
+           LEFT JOIN categories c ON c.id = a.category_id
   `;
 }
 
@@ -260,6 +275,8 @@ async function query(text, params = []) {
 async function runMigrations() {
   const sql = await fs.readFile(MIGRATION_PATH, 'utf8');
   await pool.query(sql);
+  const sql002 = await fs.readFile(MIGRATION_PATH_002, 'utf8');
+  await pool.query(sql002);
 }
 
 async function seedIfNeeded() {
@@ -277,82 +294,82 @@ async function seedIfNeeded() {
 
   for (const user of seedData.users) {
     const result = await pool.query(
-      `
-        INSERT INTO users (name, slug, email, password, bio, avatar_url, is_admin)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id
-      `,
-      [user.name, user.slug, user.email, passwordHash, user.bio, user.avatar_url, user.is_admin]
+        `
+          INSERT INTO users (name, slug, email, password, bio, full_name, avatar_url, linkedin_url, github_url, is_admin)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            RETURNING id
+        `,
+        [user.name, user.slug, user.email, passwordHash, user.bio, user.full_name || null, user.avatar_url, user.linkedin_url || null, user.github_url || null, user.is_admin]
     );
     userIdBySlug.set(user.slug, result.rows[0].id);
   }
 
   for (const category of seedData.categories) {
     const result = await pool.query(
-      `
-        INSERT INTO categories (name, slug, description)
-        VALUES ($1, $2, $3)
-        RETURNING id
-      `,
-      [category.name, category.slug, category.description]
+        `
+          INSERT INTO categories (name, slug, description)
+          VALUES ($1, $2, $3)
+            RETURNING id
+        `,
+        [category.name, category.slug, category.description]
     );
     categoryIdBySlug.set(category.slug, result.rows[0].id);
   }
 
   for (const tag of seedData.tags) {
     const result = await pool.query(
-      `
-        INSERT INTO tags (name, slug)
-        VALUES ($1, $2)
-        RETURNING id
-      `,
-      [tag.name, tag.slug]
+        `
+          INSERT INTO tags (name, slug)
+          VALUES ($1, $2)
+            RETURNING id
+        `,
+        [tag.name, tag.slug]
     );
     tagIdBySlug.set(tag.slug, result.rows[0].id);
   }
 
   for (const article of seedData.articles) {
     const result = await pool.query(
-      `
-        INSERT INTO articles (
-          title,
-          slug,
-          excerpt,
-          content,
-          cover_url,
-          author_id,
-          category_id,
-          status,
-          views,
-          meta_title,
-          meta_description,
-          published_at
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        RETURNING id
-      `,
-      [
-        article.title,
-        article.slug,
-        article.excerpt,
-        article.content,
-        article.cover_url,
-        userIdBySlug.get(article.authorSlug),
-        categoryIdBySlug.get(article.categorySlug),
-        article.status,
-        article.views,
-        article.meta_title,
-        article.meta_description,
-        article.published_at
-      ]
+        `
+          INSERT INTO articles (
+            title,
+            slug,
+            excerpt,
+            content,
+            cover_url,
+            author_id,
+            category_id,
+            status,
+            views,
+            meta_title,
+            meta_description,
+            published_at
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            RETURNING id
+        `,
+        [
+          article.title,
+          article.slug,
+          article.excerpt,
+          article.content,
+          article.cover_url,
+          userIdBySlug.get(article.authorSlug),
+          categoryIdBySlug.get(article.categorySlug),
+          article.status,
+          article.views,
+          article.meta_title,
+          article.meta_description,
+          article.published_at
+        ]
     );
 
     const articleId = result.rows[0].id;
     for (const tagSlug of article.tagSlugs) {
       const tagId = tagIdBySlug.get(tagSlug);
       await pool.query(
-        'INSERT INTO article_tags (article_id, tag_id) VALUES ($1, $2)',
-        [articleId, tagId]
+          'INSERT INTO article_tags (article_id, tag_id) VALUES ($1, $2)',
+          [articleId, tagId]
       );
     }
   }
@@ -383,14 +400,14 @@ async function getTagMapForArticleIds(articleIds) {
   const uniqueIds = [...new Set(articleIds)];
   const placeholders = uniqueIds.map((_, index) => `$${index + 1}`).join(', ');
   const { rows } = await query(
-    `
-      SELECT at.article_id, t.id, t.name, t.slug, t.created_at
-      FROM article_tags at
+      `
+        SELECT at.article_id, t.id, t.name, t.slug, t.created_at
+        FROM article_tags at
       JOIN tags t ON t.id = at.tag_id
-      WHERE at.article_id IN (${placeholders})
-      ORDER BY t.name ASC
-    `,
-    uniqueIds
+        WHERE at.article_id IN (${placeholders})
+        ORDER BY t.name ASC
+      `,
+      uniqueIds
   );
 
   const map = new Map();
@@ -416,12 +433,12 @@ async function fetchArticleByClause(whereClause, params, { includeDrafts = false
   }
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       WHERE ${conditions.join(' AND ')}
       LIMIT 1
     `,
-    params
+      params
   );
 
   if (!rows[0]) {
@@ -450,25 +467,25 @@ async function listArticles({ page = 1, perPage = 10, category = '' } = {}) {
 
   const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
   const total = await countQuery(
-    `
-      SELECT COUNT(*) AS total
-      FROM articles a
-      LEFT JOIN categories c ON c.id = a.category_id
-      ${whereClause}
-    `,
-    params
+      `
+        SELECT COUNT(*) AS total
+        FROM articles a
+               LEFT JOIN categories c ON c.id = a.category_id
+          ${whereClause}
+      `,
+      params
   );
 
   const dataParams = [...params, safePerPage, (safePage - 1) * safePerPage];
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       ${whereClause}
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $${dataParams.length - 1}
       OFFSET $${dataParams.length}
     `,
-    dataParams
+      dataParams
   );
 
   return {
@@ -493,7 +510,7 @@ async function getRelatedArticles(slug, limit = 3) {
 
   const safeLimit = Math.max(1, Math.min(12, Number(limit) || 3));
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       WHERE a.status = 'published'
         AND a.category_id = $1
@@ -501,7 +518,7 @@ async function getRelatedArticles(slug, limit = 3) {
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $3
     `,
-    [current.categoryId, current.id, safeLimit]
+      [current.categoryId, current.id, safeLimit]
   );
 
   return hydrateArticles(rows);
@@ -510,13 +527,13 @@ async function getRelatedArticles(slug, limit = 3) {
 async function incrementArticleViews(id) {
   const articleId = parseInteger(id, 'id');
   const result = await query(
-    `
-      UPDATE articles
-      SET views = views + 1, updated_at = NOW()
-      WHERE id = $1
-      RETURNING id
-    `,
-    [articleId]
+      `
+        UPDATE articles
+        SET views = views + 1, updated_at = NOW()
+        WHERE id = $1
+          RETURNING id
+      `,
+      [articleId]
   );
 
   if (!result.rows[0]) {
@@ -550,22 +567,22 @@ async function getArticlesByCategory(slug, { page = 1, perPage = 10 } = {}) {
   const safePage = normalizePage(page);
   const safePerPage = normalizePerPage(perPage);
   const total = await countQuery(
-    `
-      SELECT COUNT(*) AS total
-      FROM articles
-      WHERE status = 'published' AND category_id = $1
-    `,
-    [category.id]
+      `
+        SELECT COUNT(*) AS total
+        FROM articles
+        WHERE status = 'published' AND category_id = $1
+      `,
+      [category.id]
   );
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       WHERE a.status = 'published' AND a.category_id = $1
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $2 OFFSET $3
     `,
-    [category.id, safePerPage, (safePage - 1) * safePerPage]
+      [category.id, safePerPage, (safePage - 1) * safePerPage]
   );
 
   return {
@@ -599,24 +616,24 @@ async function getArticlesByTag(slug, { page = 1, perPage = 10 } = {}) {
   const safePage = normalizePage(page);
   const safePerPage = normalizePerPage(perPage);
   const total = await countQuery(
-    `
-      SELECT COUNT(*) AS total
-      FROM articles a
-      JOIN article_tags at ON at.article_id = a.id
-      WHERE a.status = 'published' AND at.tag_id = $1
-    `,
-    [tag.id]
+      `
+        SELECT COUNT(*) AS total
+        FROM articles a
+               JOIN article_tags at ON at.article_id = a.id
+        WHERE a.status = 'published' AND at.tag_id = $1
+      `,
+      [tag.id]
   );
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       JOIN article_tags at ON at.article_id = a.id
       WHERE a.status = 'published' AND at.tag_id = $1
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $2 OFFSET $3
     `,
-    [tag.id, safePerPage, (safePage - 1) * safePerPage]
+      [tag.id, safePerPage, (safePage - 1) * safePerPage]
   );
 
   return {
@@ -628,15 +645,25 @@ async function getArticlesByTag(slug, { page = 1, perPage = 10 } = {}) {
 
 async function getAuthors() {
   const { rows } = await query(
-    `
-      SELECT
-        u.*,
-        SUM(CASE WHEN a.status = 'published' THEN 1 ELSE 0 END) AS published_count
-      FROM users u
-      LEFT JOIN articles a ON a.author_id = u.id
-      GROUP BY u.id
-      ORDER BY u.name ASC
-    `
+      `
+        SELECT
+          u.id,
+          u.name,
+          u.slug,
+          u.email,
+          u.bio,
+          u.full_name,
+          u.avatar_url,
+          u.linkedin_url,
+          u.github_url,
+          u.is_admin,
+          u.created_at,
+          SUM(CASE WHEN a.status = 'published' THEN 1 ELSE 0 END) AS published_count
+        FROM users u
+               LEFT JOIN articles a ON a.author_id = u.id
+        GROUP BY u.id, u.name, u.slug, u.email, u.bio, u.full_name, u.avatar_url, u.linkedin_url, u.github_url, u.is_admin, u.created_at
+        ORDER BY u.name ASC
+      `
   );
 
   return rows.map((row) => ({
@@ -646,8 +673,34 @@ async function getAuthors() {
 }
 
 async function getAuthorBySlug(slug) {
-  const { rows } = await query('SELECT * FROM users WHERE slug = $1 LIMIT 1', [slug]);
-  return sanitizeUserRow(rows[0]);
+  const { rows } = await query(
+      `
+        SELECT
+          u.id,
+          u.name,
+          u.slug,
+          u.email,
+          u.bio,
+          u.full_name,
+          u.avatar_url,
+          u.linkedin_url,
+          u.github_url,
+          u.is_admin,
+          u.created_at,
+          SUM(CASE WHEN a.status = 'published' THEN 1 ELSE 0 END) AS total_articles
+        FROM users u
+               LEFT JOIN articles a ON a.author_id = u.id
+        WHERE u.slug = $1
+        GROUP BY u.id, u.name, u.slug, u.email, u.bio, u.full_name, u.avatar_url, u.linkedin_url, u.github_url, u.is_admin, u.created_at
+          LIMIT 1
+      `,
+      [slug]
+  );
+  if (!rows[0]) return null;
+  return {
+    ...sanitizeUserRow(rows[0]),
+    totalArticles: Number(rows[0].total_articles || 0)
+  };
 }
 
 async function getAuthorById(id) {
@@ -664,22 +717,22 @@ async function getArticlesByAuthor(slug, { page = 1, perPage = 10 } = {}) {
   const safePage = normalizePage(page);
   const safePerPage = normalizePerPage(perPage);
   const total = await countQuery(
-    `
-      SELECT COUNT(*) AS total
-      FROM articles
-      WHERE status = 'published' AND author_id = $1
-    `,
-    [author.id]
+      `
+        SELECT COUNT(*) AS total
+        FROM articles
+        WHERE status = 'published' AND author_id = $1
+      `,
+      [author.id]
   );
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       WHERE a.status = 'published' AND a.author_id = $1
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $2 OFFSET $3
     `,
-    [author.id, safePerPage, (safePage - 1) * safePerPage]
+      [author.id, safePerPage, (safePage - 1) * safePerPage]
   );
 
   return {
@@ -719,24 +772,24 @@ async function searchArticles(queryText, { page = 1, perPage = 10 } = {}) {
   `;
 
   const total = await countQuery(
-    `
-      SELECT COUNT(*) AS total
-      FROM articles a
-      LEFT JOIN users u ON u.id = a.author_id
-      LEFT JOIN categories c ON c.id = a.category_id
-      WHERE a.status = 'published' AND ${searchCondition}
-    `,
-    [pattern]
+      `
+        SELECT COUNT(*) AS total
+        FROM articles a
+               LEFT JOIN users u ON u.id = a.author_id
+               LEFT JOIN categories c ON c.id = a.category_id
+        WHERE a.status = 'published' AND ${searchCondition}
+      `,
+      [pattern]
   );
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       WHERE a.status = 'published' AND ${searchCondition}
       ORDER BY COALESCE(a.published_at, a.created_at) DESC, a.id DESC
       LIMIT $2 OFFSET $3
     `,
-    [pattern, safePerPage, (safePage - 1) * safePerPage]
+      [pattern, safePerPage, (safePage - 1) * safePerPage]
   );
 
   return {
@@ -880,14 +933,14 @@ async function listAdminArticles({ page = 1, perPage = 20, status = '' } = {}) {
   const total = await countQuery(`SELECT COUNT(*) AS total FROM articles a ${whereClause}`, params);
 
   const { rows } = await query(
-    `
+      `
       ${getArticleSelect()}
       ${whereClause}
       ORDER BY a.updated_at DESC, a.id DESC
       LIMIT $${params.length + 1}
       OFFSET $${params.length + 2}
     `,
-    [...params, safePerPage, (safePage - 1) * safePerPage]
+      [...params, safePerPage, (safePage - 1) * safePerPage]
   );
 
   return {
@@ -904,37 +957,37 @@ async function createArticle(payload) {
     await ensureTagsExist(data.tagIds);
 
     const result = await query(
-      `
-        INSERT INTO articles (
-          title,
-          slug,
-          excerpt,
-          content,
-          cover_url,
-          author_id,
-          category_id,
-          status,
-          meta_title,
-          meta_description,
-          published_at,
-          updated_at
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
-        RETURNING id
-      `,
-      [
-        data.title,
-        data.slug,
-        data.excerpt,
-        data.content,
-        data.coverUrl,
-        data.authorId,
-        data.categoryId,
-        data.status,
-        data.metaTitle,
-        data.metaDescription,
-        data.publishedAt
-      ]
+        `
+          INSERT INTO articles (
+            title,
+            slug,
+            excerpt,
+            content,
+            cover_url,
+            author_id,
+            category_id,
+            status,
+            meta_title,
+            meta_description,
+            published_at,
+            updated_at
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+            RETURNING id
+        `,
+        [
+          data.title,
+          data.slug,
+          data.excerpt,
+          data.content,
+          data.coverUrl,
+          data.authorId,
+          data.categoryId,
+          data.status,
+          data.metaTitle,
+          data.metaDescription,
+          data.publishedAt
+        ]
     );
 
     const articleId = result.rows[0].id;
@@ -959,37 +1012,37 @@ async function updateArticle(id, payload) {
     await ensureTagsExist(data.tagIds);
 
     await query(
-      `
-        UPDATE articles
-        SET
-          title = $1,
-          slug = $2,
-          excerpt = $3,
-          content = $4,
-          cover_url = $5,
-          author_id = $6,
-          category_id = $7,
-          status = $8,
-          meta_title = $9,
-          meta_description = $10,
-          published_at = $11,
-          updated_at = NOW()
-        WHERE id = $12
-      `,
-      [
-        data.title,
-        data.slug,
-        data.excerpt,
-        data.content,
-        data.coverUrl,
-        data.authorId,
-        data.categoryId,
-        data.status,
-        data.metaTitle,
-        data.metaDescription,
-        data.publishedAt,
-        articleId
-      ]
+        `
+          UPDATE articles
+          SET
+            title = $1,
+            slug = $2,
+            excerpt = $3,
+            content = $4,
+            cover_url = $5,
+            author_id = $6,
+            category_id = $7,
+            status = $8,
+            meta_title = $9,
+            meta_description = $10,
+            published_at = $11,
+            updated_at = NOW()
+          WHERE id = $12
+        `,
+        [
+          data.title,
+          data.slug,
+          data.excerpt,
+          data.content,
+          data.coverUrl,
+          data.authorId,
+          data.categoryId,
+          data.status,
+          data.metaTitle,
+          data.metaDescription,
+          data.publishedAt,
+          articleId
+        ]
     );
 
     await syncArticleTags(articleId, data.tagIds);
@@ -1032,8 +1085,8 @@ async function createCategory(payload) {
   try {
     const data = normalizeCategoryPayload(payload);
     const result = await query(
-      'INSERT INTO categories (name, slug, description) VALUES ($1, $2, $3) RETURNING id',
-      [data.name, data.slug, data.description]
+        'INSERT INTO categories (name, slug, description) VALUES ($1, $2, $3) RETURNING id',
+        [data.name, data.slug, data.description]
     );
     return getCategoryById(result.rows[0].id);
   } catch (error) {
@@ -1051,8 +1104,8 @@ async function updateCategory(id, payload) {
   try {
     const data = normalizeCategoryPayload(payload);
     await query(
-      'UPDATE categories SET name = $1, slug = $2, description = $3 WHERE id = $4',
-      [data.name, data.slug, data.description, categoryId]
+        'UPDATE categories SET name = $1, slug = $2, description = $3 WHERE id = $4',
+        [data.name, data.slug, data.description, categoryId]
     );
     return getCategoryById(categoryId);
   } catch (error) {
@@ -1135,6 +1188,64 @@ async function listAuthors() {
   return getAuthors();
 }
 
+function mapSiteSettingsRow(row) {
+  if (!row) return null;
+  return {
+    title: row.title,
+    name: row.name,
+    description: row.description,
+    mission: row.mission,
+    contacts: { email: row.contact_email },
+    foundedDate: row.founded_date
+        ? (row.founded_date instanceof Date
+            ? row.founded_date.toISOString().slice(0, 10)
+            : String(row.founded_date).slice(0, 10))
+        : null,
+    socialLinks: Array.isArray(row.social_links) ? row.social_links : (row.social_links ? JSON.parse(row.social_links) : []),
+    updatedAt: row.updated_at
+  };
+}
+
+async function getSiteSettings() {
+  const { rows } = await query('SELECT * FROM site_settings ORDER BY id ASC LIMIT 1');
+  return mapSiteSettingsRow(rows[0]);
+}
+
+async function updateSiteSettings(payload = {}) {
+  const existing = await getSiteSettings();
+  if (!existing) {
+    throw new AppError(404, 'NOT_FOUND', 'Site settings not found');
+  }
+
+  const title = parseNullableString(payload.title) || existing.title;
+  const name = parseNullableString(payload.name) || existing.name;
+  const description = parseNullableString(payload.description);
+  const mission = parseNullableString(payload.mission);
+  const contactEmail = parseNullableString(payload.contactEmail || (payload.contacts && payload.contacts.email));
+  const foundedDate = parseNullableString(payload.foundedDate); // передаємо як рядок, БД сама приведе
+  const socialLinks = Array.isArray(payload.socialLinks) ? JSON.stringify(payload.socialLinks) : null;
+
+  const { rows } = await query(
+      `
+        UPDATE site_settings
+        SET
+          title         = COALESCE($1, title),
+          name          = COALESCE($2, name),
+          description   = COALESCE($3, description),
+          mission       = COALESCE($4, mission),
+          contact_email = COALESCE($5, contact_email),
+          founded_date  = COALESCE($6, founded_date),
+          social_links  = COALESCE($7, social_links),
+          updated_at    = NOW()
+        WHERE id = (SELECT id FROM site_settings ORDER BY id ASC LIMIT 1)
+          RETURNING *
+      `,
+      [title, name, description, mission, contactEmail, foundedDate, socialLinks]
+  );
+
+  return mapSiteSettingsRow(rows[0]);
+}
+
 function getDbMode() {
   return dbMode;
 }
@@ -1171,5 +1282,7 @@ module.exports = {
   createTag,
   updateTag,
   deleteTag,
-  listAuthors
+  listAuthors,
+  getSiteSettings,
+  updateSiteSettings
 };
