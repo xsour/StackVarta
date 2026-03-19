@@ -10,7 +10,7 @@ export default function SiteHeader({ categories = [] }) {
       <div className="container header-inner">
         <div>
           <Link href="/" className="brand">
-            IT Blog
+            StackVarta
           </Link>
         </div>
 
