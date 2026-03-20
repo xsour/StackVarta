@@ -12,6 +12,7 @@ const searchRoutes = require('./routes/search');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const healthRoutes = require('./routes/health');
+const aboutRoutes = require('./routes/about');
 const store = require('./models/store');
 const { notFound } = require('./middleware/not-found');
 const { errorHandler } = require('./middleware/error-handler');
@@ -48,6 +49,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/health', healthRoutes);
+app.use('/api/about', aboutRoutes);
 app.use('/api/articles', articlesRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/tags', tagsRoutes);

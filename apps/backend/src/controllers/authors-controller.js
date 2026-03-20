@@ -11,7 +11,7 @@ async function authorProfile(req, res) {
   if (!author) {
     return sendError(res, 404, 'NOT_FOUND', 'Author not found');
   }
-
+  // totalArticles вже включено в getAuthorBySlug через COUNT у SQL
   return sendData(res, author);
 }
 
@@ -33,3 +33,4 @@ module.exports = {
   authorProfile,
   authorArticles
 };
+

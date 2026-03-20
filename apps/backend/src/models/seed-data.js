@@ -33,24 +33,33 @@ const users = [
     name: 'Олег Коваль',
     slug: 'oleh-koval',
     email: 'oleh@example.com',
-    bio: 'Frontend/SEO ентузіаст. Пише про SSR, структуру сторінок і якісний користувацький досвід.',
-    avatar_url: '/author-avatar.svg',
+    bio: 'Frontend-інженер з 8-річним досвідом. Спеціалізується на побудові високонавантажених інтерфейсів з використанням React та Next.js. Активно впроваджує практики технічного SEO та Core Web Vitals.',
+    full_name: 'Олег Миколайович Коваль',
+    avatar_url: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
+    linkedin_url: 'https://linkedin.com/in/oleh-koval',
+    github_url: 'https://github.com/oleh-koval',
     is_admin: true
   },
   {
     name: 'Ірина Гнатюк',
     slug: 'iryna-hnatiuk',
     email: 'iryna@example.com',
-    bio: 'Backend інженерка. Пише про API, PostgreSQL та стабільну серверну архітектуру.',
-    avatar_url: '/author-avatar.svg',
+    bio: 'Backend-розробниця, експертка з PostgreSQL та системного дизайну. Працює над оптимізацією запитів та масштабуванням мікросервісів. Регулярна спікерка на профільних конференціях.',
+    full_name: 'Ірина Василівна Гнатюк',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200',
+    linkedin_url: 'https://linkedin.com/in/iryna-hnatiuk',
+    github_url: 'https://github.com/iryna-hnatiuk',
     is_admin: true
   },
   {
     name: 'Максим Бондар',
     slug: 'maksym-bondar',
     email: 'maksym@example.com',
-    bio: 'DevOps інженер і технічний редактор. Пише про deployment, домени та технічне SEO.',
-    avatar_url: '/author-avatar.svg',
+    bio: 'DevOps-інженер та системний адміністратор. Захоплюється автоматизацією процесів деплою, безпекою хмарних інфраструктур та моніторингом систем у реальному часі.',
+    full_name: 'Максим Артемович Бондар',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200',
+    linkedin_url: 'https://linkedin.com/in/maksym-bondar',
+    github_url: 'https://github.com/maksym-bondar',
     is_admin: true
   }
 ];
