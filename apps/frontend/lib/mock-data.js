@@ -51,22 +51,60 @@ export const categories = [
 
 export const authors = [
   {
-    slug: 'oleh-koval',
-    name: 'Олег Коваль',
-    bio: 'Frontend інженер. Пише про SSR, структуру сторінок і якісний користувацький досвід.',
-    avatarUrl: '/author-avatar.svg'
+    id: 1,
+    slug: 'andrii-koval',
+    name: 'Андрій Коваль',
+    fullName: 'Андрій Коваль',
+    bio: 'Cloud Architecture, Go, Docker & Kubernetes. 6+ років у розробці високонавантажених систем. Працював над міграцією монолітів у мікросервісну архітектуру для фінтех-проєктів.',
+    avatarUrl: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/andrii-koval-example',
+      github: 'https://github.com/akov-dev'
+    }
   },
   {
-    slug: 'iryna-hnatiuk',
-    name: 'Ірина Гнатюк',
-    bio: 'Backend інженерка. Пише про API, PostgreSQL та стабільну серверну архітектуру.',
-    avatarUrl: '/author-avatar.svg'
+    id: 2,
+    slug: 'mariia-petrenko',
+    name: 'Марія Петренко',
+    fullName: 'Марія Петренко',
+    bio: 'React, Next.js, Web Performance & Accessibility. Lead Frontend Developer, 5 років досвіду. Спеціалізується на створенні швидких та інклюзивних веб-інтерфейсів.',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/mari-petrenko-example'
+    }
   },
   {
-    slug: 'maksym-bondar',
-    name: 'Максим Бондар',
-    bio: 'DevOps інженер і технічний редактор. Пише про deployment, домени та технічне SEO.',
-    avatarUrl: '/author-avatar.svg'
+    id: 3,
+    slug: 'oleksii-vovk',
+    name: 'Олексій Вовк',
+    fullName: 'Олексій Вовк',
+    bio: 'Network Security, Pentesting, OWASP. Сертифікований фахівець з інформаційної безпеки (OSCP). Має досвід аудиту безпеки для банківських додатків.',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/vovk-security'
+    }
+  },
+  {
+    id: 4,
+    slug: 'serhii-bondarenko',
+    name: 'Сергій Бондаренко',
+    fullName: 'Сергій Бондаренко',
+    bio: 'Tech Scouting, IDE Optimization, Productivity Tools. Tech Lead / CTO в стартапах. За останні 10 років протестував сотні фреймворків та інструментів розробки.',
+    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/serhii-tech-reviews'
+    }
+  },
+  {
+    id: 5,
+    slug: 'olena-dmytruk',
+    name: 'Олена Дмитрук',
+    fullName: 'Олена Дмитрук',
+    bio: 'Machine Learning, Natural Language Processing (NLP), Python. Data Scientist з досвідом розробки рекомендаційних систем та впровадження LLM у бізнес-процеси.',
+    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200&h=200',
+    socials: {
+      linkedin: 'https://linkedin.com/in/olena-ds-example'
+    }
   }
 ];
 
@@ -91,7 +129,7 @@ const articleSeeds = [
     slug: 'nextjs-app-router-for-seo-blog',
     excerpt: 'Як App Router з SSR/SSG допомагає будувати індексований контентний сайт без зайвих компромісів.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'oleh-koval',
+    authorSlug: 'mariia-petrenko',
     tagSlugs: ['nextjs', 'ssr', 'seo']
   },
   {
@@ -99,7 +137,7 @@ const articleSeeds = [
     slug: 'semantic-homepage-without-noise',
     excerpt: 'Як побудувати головну сторінку блогу так, щоб і люди, і пошуковики бачили правильну структуру.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'oleh-koval',
+    authorSlug: 'mariia-petrenko',
     tagSlugs: ['react', 'seo', 'ssr']
   },
   {
@@ -107,7 +145,7 @@ const articleSeeds = [
     slug: 'ssg-isr-or-ssr-for-content-blog',
     excerpt: 'Коротка логіка вибору рендерингу для головної, статті, категорії та сторінки пошуку.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'maksym-bondar',
+    authorSlug: 'mariia-petrenko',
     tagSlugs: ['nextjs', 'ssr', 'react']
   },
   {
@@ -115,7 +153,7 @@ const articleSeeds = [
     slug: 'express-api-foundation-for-it-blog',
     excerpt: 'Мінімальний backend-каркас з публічними ендпоінтами, який не соромно віддати команді.',
     categorySlug: 'backend-devops',
-    authorSlug: 'iryna-hnatiuk',
+    authorSlug: 'andrii-koval',
     tagSlugs: ['nodejs', 'postgresql', 'devops']
   },
   {
@@ -123,7 +161,7 @@ const articleSeeds = [
     slug: 'railway-guide-for-monorepo',
     excerpt: 'Ключові кроки перед першим деплоєм frontend, backend і бази даних у монорепозиторії.',
     categorySlug: 'backend-devops',
-    authorSlug: 'maksym-bondar',
+    authorSlug: 'andrii-koval',
     tagSlugs: ['railway', 'devops', 'seo']
   },
   {
@@ -131,7 +169,7 @@ const articleSeeds = [
     slug: 'postgresql-schema-for-news-site',
     excerpt: 'Стартова схема БД для авторів, категорій, статей, тегів та індексів пошуку.',
     categorySlug: 'backend-devops',
-    authorSlug: 'iryna-hnatiuk',
+    authorSlug: 'andrii-koval',
     tagSlugs: ['postgresql', 'nodejs', 'tools']
   },
   {
@@ -139,7 +177,7 @@ const articleSeeds = [
     slug: 'ai-tools-for-editorial-research',
     excerpt: 'Як AI допомагає готувати матеріали, але не підміняє редакторську перевірку джерел.',
     categorySlug: 'ai-ml',
-    authorSlug: 'oleh-koval',
+    authorSlug: 'olena-dmytruk',
     tagSlugs: ['ai', 'ml', 'tools']
   },
   {
@@ -147,7 +185,7 @@ const articleSeeds = [
     slug: 'ml-explainers-for-technical-blog',
     excerpt: 'Як писати про ML так, щоб матеріал залишався точним і зрозумілим для ширшої аудиторії.',
     categorySlug: 'ai-ml',
-    authorSlug: 'iryna-hnatiuk',
+    authorSlug: 'olena-dmytruk',
     tagSlugs: ['ai', 'ml', 'seo']
   },
   {
@@ -155,7 +193,7 @@ const articleSeeds = [
     slug: 'basic-security-headers-for-public-site',
     excerpt: 'Які HTTP-заголовки варто перевіряти ще до того, як сайт отримає реальний трафік.',
     categorySlug: 'cybersecurity',
-    authorSlug: 'maksym-bondar',
+    authorSlug: 'oleksii-vovk',
     tagSlugs: ['security', 'devops', 'tools']
   },
   {
@@ -163,7 +201,7 @@ const articleSeeds = [
     slug: 'why-admin-must-stay-out-of-index',
     excerpt: 'Чому `/admin` не має потрапляти в пошук і як правильно закрити службову зону від індексації.',
     categorySlug: 'cybersecurity',
-    authorSlug: 'maksym-bondar',
+    authorSlug: 'oleksii-vovk',
     tagSlugs: ['security', 'seo', 'tools']
   },
   {
@@ -171,7 +209,7 @@ const articleSeeds = [
     slug: 'google-search-console-without-chaos',
     excerpt: 'Що перевірити після верифікації домену і як швидко оцінити технічний стан ресурсу.',
     categorySlug: 'tools-reviews',
-    authorSlug: 'oleh-koval',
+    authorSlug: 'serhii-bondarenko',
     tagSlugs: ['seo', 'tools', 'railway']
   },
   {
@@ -179,7 +217,7 @@ const articleSeeds = [
     slug: 'toolkit-for-content-engineering-team',
     excerpt: 'Практична добірка інструментів для розробки, деплою, зберігання даних і технічного моніторингу.',
     categorySlug: 'tools-reviews',
-    authorSlug: 'iryna-hnatiuk',
+    authorSlug: 'serhii-bondarenko',
     tagSlugs: ['tools', 'devops', 'railway']
   }
 ];
@@ -236,6 +274,7 @@ export const articles = articleSeeds.map((seed, index) => ({
     ...categoryParagraphs[seed.categorySlug]
   ].join('\n\n'),
   publishedAt: publishedDates[index],
+  updatedAt: publishedDates[index],
   views: 120 + index * 17,
   metaTitle: `${seed.title} | IT Blog`,
   metaDescription: seed.excerpt
@@ -348,4 +387,27 @@ export function searchArticles(query) {
 
     return haystack.includes(normalized);
   });
+}
+
+export const aboutData = {
+  title: 'Про нас | StackVarta',
+  name: 'StackVarta',
+  description: 'Сучасний технічний медіа-ресурс, присвячений архітектурі програмного забезпечення, DevOps-практикам та впровадженню AI в розробку. Ми пишемо для української IT-спільноти: від студентів, які роблять перші кроки в коді, до досвідчених інженерів, які шукають глибоку аналітику та перевірені технічні рішення.',
+  mission: 'Спрощувати складне. Ми прагнемо стати надійною точкою опори для розробників, надаючи контент, який економить час на налагодження та допомагає будувати безпечні, швидкі й масштабовані системи.',
+  foundedAt: 'Запуск',
+  foundedNote: 'Проєкт офіційно запущено в лютому 2026 року як незалежну ініціативу в межах освітнього курсу з SEO-оптимізації та просування.',
+  contacts: {
+    email: 'stackvarta@gmail.com'
+  },
+  socialLinks: [
+    { name: 'GitHub', url: 'https://github.com/xsour/StackNova' }
+  ]
+};
+
+export function getAboutData() {
+  return aboutData;
+}
+
+export function getArticleCountByAuthor(slug) {
+  return articles.filter((article) => article.authorSlug === slug).length;
 }

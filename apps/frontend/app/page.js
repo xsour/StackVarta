@@ -6,7 +6,7 @@ import { getHomePageData } from '../lib/api';
 export const revalidate = 300;
 
 export const metadata = {
-  title: 'IT Blog — новини та статті про технології',
+  title: 'StackVarta — новини та статті про технології',
   description:
     'Останні матеріали про frontend, backend, DevOps, AI, кібербезпеку та корисні інструменти.',
   alternates: {
@@ -14,7 +14,8 @@ export const metadata = {
   }
 };
 
-export default async function HomePage({ searchParams }) {
+export default async function HomePage(props) {
+  const searchParams = await props.searchParams;
   const category = searchParams?.category || '';
   const page = Math.max(1, Number(searchParams?.page || 1) || 1);
   const { items, meta, categories } = await getHomePageData({ page, category });
@@ -23,7 +24,7 @@ export default async function HomePage({ searchParams }) {
     <main className="container page">
       <section className="hero">
         <p className="eyebrow">Технології та практика</p>
-        <h1>IT Blog</h1>
+        <h1>StackVarta</h1>
         <p className="muted">
           Публікації команди про frontend, backend, DevOps, AI, кібербезпеку та інструменти,
           з якими ми працюємо щодня.

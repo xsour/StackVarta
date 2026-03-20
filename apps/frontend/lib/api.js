@@ -12,7 +12,9 @@ import {
   getRelatedArticles as getFallbackRelatedArticles,
   getTagBySlug as getFallbackTagBySlug,
   searchArticles as searchFallbackArticles,
-  tags as fallbackTags
+  tags as fallbackTags,
+  getAboutData as getFallbackAboutData,
+  getArticleCountByAuthor as getFallbackArticleCountByAuthor
 } from './mock-data';
 import { getApiBaseUrl } from './site-config';
 
@@ -223,7 +225,8 @@ export async function getAuthorPageData(slug, { page = 1 } = {}) {
     }
 
     const { items, meta } = getFallbackArticlesByAuthor(slug, { page, perPage: 10 });
-    return { author, items, meta };
+    const totalArticles = getFallbackArticleCountByAuthor(slug);
+    return { author: { ...author, totalArticles }, items, meta };
   }
 }
 
@@ -302,4 +305,13 @@ export async function getSitemapData() {
     tags,
     articles
   };
+}
+
+export async function getAboutPageData() {
+  try {
+    const payload = await requestJson('/api/about');
+    return payload.data;
+  } catch {
+    return getFallbackAboutData();
+  }
 }
