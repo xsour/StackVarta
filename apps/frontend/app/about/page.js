@@ -2,11 +2,33 @@ import { getAboutPageData } from '../../lib/api';
 
 export const revalidate = 300;
 
+function parseDisplayDate(value) {
+  if (!value) return null;
+
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  return new Date(value);
+}
+
+function formatFoundedDate(value) {
+  const parsedDate = parseDisplayDate(value);
+  if (!parsedDate || Number.isNaN(parsedDate.getTime())) return '';
+
+  return new Intl.DateTimeFormat('uk-UA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(parsedDate);
+}
+
 export async function generateMetadata() {
   const data = await getAboutPageData();
 
   return {
-    title: data.title,
+    title: data.title || 'Про нас',
     description: data.description,
     alternates: {
       canonical: '/about'
@@ -16,6 +38,8 @@ export async function generateMetadata() {
 
 export default async function AboutPage() {
   const data = await getAboutPageData();
+  const email = data?.contacts?.email || '';
+  const socialLinks = Array.isArray(data?.socialLinks) ? data.socialLinks : [];
 
   return (
     <main className="container page">
@@ -37,38 +61,50 @@ export default async function AboutPage() {
         <p className="muted" style={{ margin: '0 0 16px', lineHeight: 1.6 }}>
           Для пропозицій, фідбеку або запитів на співпрацю:
         </p>
-        <a href={`mailto:${data.contacts.email}`} className="pill" style={{ display: 'inline-flex' }}>
-          {data.contacts.email}
-        </a>
+        {email ? (
+          <a href={`mailto:${email}`} className="pill" style={{ display: 'inline-flex' }}>
+            {email}
+          </a>
+        ) : (
+          <p className="muted">Контактний email тимчасово не вказано.</p>
+        )}
       </section>
 
       <section className="panel section-spacer">
         <h2>Соцмережі</h2>
-        <nav className="pill-list">
-          {data.socialLinks.map((link) => (
-            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="pill">
-              {link.name}
-            </a>
-          ))}
-        </nav>
+        {socialLinks.length ? (
+          <nav className="pill-list">
+            {socialLinks.map((link) => (
+              <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="pill">
+                {link.name}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <p className="muted">Соцмережі проєкту поки не додано.</p>
+        )}
       </section>
 
-      {(data.foundedAt || data.foundedNote) && (
+      {data.foundedDate ? (
         <section className="panel section-spacer" style={{ borderStyle: 'dashed', opacity: 0.8 }}>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline', flexWrap: 'wrap' }}>
-            {data.foundedAt && (
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                {data.foundedAt}
-              </span>
-            )}
-            {data.foundedNote && (
-              <p className="muted" style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
-                {data.foundedNote}
-              </p>
-            )}
+            <span
+              style={{
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                color: 'var(--accent)',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase'
+              }}
+            >
+              Дата заснування
+            </span>
+            <p className="muted" style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
+              {formatFoundedDate(data.foundedDate)}
+            </p>
           </div>
         </section>
-      )}
+      ) : null}
     </main>
   );
 }

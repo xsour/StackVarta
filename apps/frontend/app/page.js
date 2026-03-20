@@ -1,12 +1,14 @@
 import Link from 'next/link';
+
 import ArticleCard from '../components/ArticleCard';
 import Pagination from '../components/Pagination';
 import { getHomePageData } from '../lib/api';
+import { siteConfig } from '../lib/site-config';
 
 export const revalidate = 300;
 
 export const metadata = {
-  title: 'StackVarta — новини та статті про технології',
+  title: 'Новини та статті про технології',
   description:
     'Останні матеріали про frontend, backend, DevOps, AI, кібербезпеку та корисні інструменти.',
   alternates: {
@@ -24,7 +26,7 @@ export default async function HomePage(props) {
     <main className="container page">
       <section className="hero">
         <p className="eyebrow">Технології та практика</p>
-        <h1>StackVarta</h1>
+        <h1>{siteConfig.name}</h1>
         <p className="muted">
           Публікації команди про frontend, backend, DevOps, AI, кібербезпеку та інструменти,
           з якими ми працюємо щодня.

@@ -4,22 +4,51 @@ import { notFound } from 'next/navigation';
 
 import ArticleCard from '../../../components/ArticleCard';
 import ArticleViewTracker from '../../../components/ArticleViewTracker';
-import { getArticlePageData } from '../../../lib/api';
-import { getPublishedArticles } from '../../../lib/mock-data';
+import { getArticlePageData, getFeedArticles } from '../../../lib/api';
 import { siteConfig, toAbsoluteImageUrl, toAbsoluteUrl } from '../../../lib/site-config';
 
 export const revalidate = 60;
 
-export function generateStaticParams() {
-  return getPublishedArticles().map((article) => ({ slug: article.slug }));
+export async function generateStaticParams() {
+  const articles = await getFeedArticles(100);
+  return articles.map((article) => ({ slug: article.slug }));
+}
+
+function parseDisplayDate(value) {
+  if (!value) return null;
+
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  return new Date(value);
 }
 
 function formatDate(value) {
+  const parsedDate = parseDisplayDate(value);
+  if (!parsedDate || Number.isNaN(parsedDate.getTime())) return '';
+
   return new Intl.DateTimeFormat('uk-UA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  }).format(new Date(value));
+  }).format(parsedDate);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getPageTitle(article) {
+  const rawTitle = String(article?.metaTitle || article?.title || '').trim();
+  if (!rawTitle) return '';
+
+  const patterns = [siteConfig.name, 'IT Blog', 'StackNova']
+    .filter(Boolean)
+    .map((name) => new RegExp(`\\s*(\\||—|-)\\s*${escapeRegExp(name)}$`, 'i'));
+
+  return patterns.reduce((title, pattern) => title.replace(pattern, '').trim(), rawTitle) || rawTitle;
 }
 
 export async function generateMetadata(props) {
@@ -32,14 +61,16 @@ export async function generateMetadata(props) {
     };
   }
 
+  const pageTitle = getPageTitle(article);
+
   return {
-    title: article.metaTitle || article.title,
+    title: pageTitle,
     description: article.metaDescription || article.excerpt,
     alternates: {
       canonical: `/articles/${article.slug}`
     },
     openGraph: {
-      title: article.metaTitle || article.title,
+      title: `${pageTitle} | ${siteConfig.name}`,
       description: article.metaDescription || article.excerpt,
       url: `${siteConfig.baseUrl}/articles/${article.slug}`,
       type: 'article',
@@ -162,7 +193,7 @@ export default async function ArticlePage(props) {
                   <span><strong>Оновлено:</strong> {formatDate(article.updatedAt)}</span>
                 )}
                 {(!article.updatedAt || article.updatedAt === article.publishedAt) && (
-                   <span><strong>Оновлено:</strong> {formatDate(article.publishedAt)}</span>
+                  <span><strong>Оновлено:</strong> {formatDate(article.publishedAt)}</span>
                 )}
               </div>
             </div>

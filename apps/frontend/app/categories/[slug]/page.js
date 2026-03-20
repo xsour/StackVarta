@@ -2,12 +2,13 @@ import { notFound } from 'next/navigation';
 
 import ArticleCard from '../../../components/ArticleCard';
 import Pagination from '../../../components/Pagination';
-import { getCategoryPageData } from '../../../lib/api';
-import { categories } from '../../../lib/mock-data';
+import { getCategories, getCategoryPageData } from '../../../lib/api';
+import { siteConfig } from '../../../lib/site-config';
 
 export const revalidate = 300;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories.map((category) => ({ slug: category.slug }));
 }
 
@@ -28,7 +29,7 @@ export async function generateMetadata(props) {
       canonical: `/categories/${category.slug}`
     },
     openGraph: {
-      title: `${category.name} | IT Blog`,
+      title: `${category.name} | ${siteConfig.name}`,
       description: category.description,
       url: `/categories/${category.slug}`
     }

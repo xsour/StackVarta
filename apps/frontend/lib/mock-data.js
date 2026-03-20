@@ -10,7 +10,7 @@ function getSafeBaseUrl() {
 }
 
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || 'IT Blog',
+  name: process.env.NEXT_PUBLIC_SITE_NAME || 'StackVarta',
   baseUrl: getSafeBaseUrl(),
   description:
     'Новини та статті про frontend, backend, DevOps, AI, кібербезпеку й корисні інструменти.'
@@ -52,58 +52,38 @@ export const categories = [
 export const authors = [
   {
     id: 1,
-    slug: 'andrii-koval',
-    name: 'Андрій Коваль',
-    fullName: 'Андрій Коваль',
-    bio: 'Cloud Architecture, Go, Docker & Kubernetes. 6+ років у розробці високонавантажених систем. Працював над міграцією монолітів у мікросервісну архітектуру для фінтех-проєктів.',
+    slug: 'oleh-koval',
+    name: 'Олег Коваль',
+    fullName: 'Олег Миколайович Коваль',
+    bio: 'Frontend-інженер з 8-річним досвідом. Спеціалізується на побудові високонавантажених інтерфейсів з використанням React та Next.js. Активно впроваджує практики технічного SEO та Core Web Vitals.',
     avatarUrl: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
     socials: {
-      linkedin: 'https://linkedin.com/in/andrii-koval-example',
-      github: 'https://github.com/akov-dev'
+      linkedin: 'https://linkedin.com/in/oleh-koval',
+      github: 'https://github.com/oleh-koval'
     }
   },
   {
     id: 2,
-    slug: 'mariia-petrenko',
-    name: 'Марія Петренко',
-    fullName: 'Марія Петренко',
-    bio: 'React, Next.js, Web Performance & Accessibility. Lead Frontend Developer, 5 років досвіду. Спеціалізується на створенні швидких та інклюзивних веб-інтерфейсів.',
+    slug: 'iryna-hnatiuk',
+    name: 'Ірина Гнатюк',
+    fullName: 'Ірина Василівна Гнатюк',
+    bio: 'Backend-розробниця, експертка з PostgreSQL та системного дизайну. Працює над оптимізацією запитів та масштабуванням мікросервісів. Регулярна спікерка на профільних конференціях.',
     avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200',
     socials: {
-      linkedin: 'https://linkedin.com/in/mari-petrenko-example'
+      linkedin: 'https://linkedin.com/in/iryna-hnatiuk',
+      github: 'https://github.com/iryna-hnatiuk'
     }
   },
   {
     id: 3,
-    slug: 'oleksii-vovk',
-    name: 'Олексій Вовк',
-    fullName: 'Олексій Вовк',
-    bio: 'Network Security, Pentesting, OWASP. Сертифікований фахівець з інформаційної безпеки (OSCP). Має досвід аудиту безпеки для банківських додатків.',
+    slug: 'maksym-bondar',
+    name: 'Максим Бондар',
+    fullName: 'Максим Артемович Бондар',
+    bio: 'DevOps-інженер та системний адміністратор. Захоплюється автоматизацією процесів деплою, безпекою хмарних інфраструктур та моніторингом систем у реальному часі.',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200',
     socials: {
-      linkedin: 'https://linkedin.com/in/vovk-security'
-    }
-  },
-  {
-    id: 4,
-    slug: 'serhii-bondarenko',
-    name: 'Сергій Бондаренко',
-    fullName: 'Сергій Бондаренко',
-    bio: 'Tech Scouting, IDE Optimization, Productivity Tools. Tech Lead / CTO в стартапах. За останні 10 років протестував сотні фреймворків та інструментів розробки.',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200&h=200',
-    socials: {
-      linkedin: 'https://linkedin.com/in/serhii-tech-reviews'
-    }
-  },
-  {
-    id: 5,
-    slug: 'olena-dmytruk',
-    name: 'Олена Дмитрук',
-    fullName: 'Олена Дмитрук',
-    bio: 'Machine Learning, Natural Language Processing (NLP), Python. Data Scientist з досвідом розробки рекомендаційних систем та впровадження LLM у бізнес-процеси.',
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200&h=200',
-    socials: {
-      linkedin: 'https://linkedin.com/in/olena-ds-example'
+      linkedin: 'https://linkedin.com/in/maksym-bondar',
+      github: 'https://github.com/maksym-bondar'
     }
   }
 ];
@@ -129,7 +109,7 @@ const articleSeeds = [
     slug: 'nextjs-app-router-for-seo-blog',
     excerpt: 'Як App Router з SSR/SSG допомагає будувати індексований контентний сайт без зайвих компромісів.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'mariia-petrenko',
+    authorSlug: 'oleh-koval',
     tagSlugs: ['nextjs', 'ssr', 'seo']
   },
   {
@@ -137,7 +117,7 @@ const articleSeeds = [
     slug: 'semantic-homepage-without-noise',
     excerpt: 'Як побудувати головну сторінку блогу так, щоб і люди, і пошуковики бачили правильну структуру.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'mariia-petrenko',
+    authorSlug: 'oleh-koval',
     tagSlugs: ['react', 'seo', 'ssr']
   },
   {
@@ -145,7 +125,7 @@ const articleSeeds = [
     slug: 'ssg-isr-or-ssr-for-content-blog',
     excerpt: 'Коротка логіка вибору рендерингу для головної, статті, категорії та сторінки пошуку.',
     categorySlug: 'javascript-frontend',
-    authorSlug: 'mariia-petrenko',
+    authorSlug: 'maksym-bondar',
     tagSlugs: ['nextjs', 'ssr', 'react']
   },
   {
@@ -153,7 +133,7 @@ const articleSeeds = [
     slug: 'express-api-foundation-for-it-blog',
     excerpt: 'Мінімальний backend-каркас з публічними ендпоінтами, який не соромно віддати команді.',
     categorySlug: 'backend-devops',
-    authorSlug: 'andrii-koval',
+    authorSlug: 'iryna-hnatiuk',
     tagSlugs: ['nodejs', 'postgresql', 'devops']
   },
   {
@@ -161,7 +141,7 @@ const articleSeeds = [
     slug: 'railway-guide-for-monorepo',
     excerpt: 'Ключові кроки перед першим деплоєм frontend, backend і бази даних у монорепозиторії.',
     categorySlug: 'backend-devops',
-    authorSlug: 'andrii-koval',
+    authorSlug: 'maksym-bondar',
     tagSlugs: ['railway', 'devops', 'seo']
   },
   {
@@ -169,7 +149,7 @@ const articleSeeds = [
     slug: 'postgresql-schema-for-news-site',
     excerpt: 'Стартова схема БД для авторів, категорій, статей, тегів та індексів пошуку.',
     categorySlug: 'backend-devops',
-    authorSlug: 'andrii-koval',
+    authorSlug: 'iryna-hnatiuk',
     tagSlugs: ['postgresql', 'nodejs', 'tools']
   },
   {
@@ -177,7 +157,7 @@ const articleSeeds = [
     slug: 'ai-tools-for-editorial-research',
     excerpt: 'Як AI допомагає готувати матеріали, але не підміняє редакторську перевірку джерел.',
     categorySlug: 'ai-ml',
-    authorSlug: 'olena-dmytruk',
+    authorSlug: 'oleh-koval',
     tagSlugs: ['ai', 'ml', 'tools']
   },
   {
@@ -185,7 +165,7 @@ const articleSeeds = [
     slug: 'ml-explainers-for-technical-blog',
     excerpt: 'Як писати про ML так, щоб матеріал залишався точним і зрозумілим для ширшої аудиторії.',
     categorySlug: 'ai-ml',
-    authorSlug: 'olena-dmytruk',
+    authorSlug: 'iryna-hnatiuk',
     tagSlugs: ['ai', 'ml', 'seo']
   },
   {
@@ -193,7 +173,7 @@ const articleSeeds = [
     slug: 'basic-security-headers-for-public-site',
     excerpt: 'Які HTTP-заголовки варто перевіряти ще до того, як сайт отримає реальний трафік.',
     categorySlug: 'cybersecurity',
-    authorSlug: 'oleksii-vovk',
+    authorSlug: 'maksym-bondar',
     tagSlugs: ['security', 'devops', 'tools']
   },
   {
@@ -201,7 +181,7 @@ const articleSeeds = [
     slug: 'why-admin-must-stay-out-of-index',
     excerpt: 'Чому `/admin` не має потрапляти в пошук і як правильно закрити службову зону від індексації.',
     categorySlug: 'cybersecurity',
-    authorSlug: 'oleksii-vovk',
+    authorSlug: 'maksym-bondar',
     tagSlugs: ['security', 'seo', 'tools']
   },
   {
@@ -209,7 +189,7 @@ const articleSeeds = [
     slug: 'google-search-console-without-chaos',
     excerpt: 'Що перевірити після верифікації домену і як швидко оцінити технічний стан ресурсу.',
     categorySlug: 'tools-reviews',
-    authorSlug: 'serhii-bondarenko',
+    authorSlug: 'oleh-koval',
     tagSlugs: ['seo', 'tools', 'railway']
   },
   {
@@ -217,7 +197,7 @@ const articleSeeds = [
     slug: 'toolkit-for-content-engineering-team',
     excerpt: 'Практична добірка інструментів для розробки, деплою, зберігання даних і технічного моніторингу.',
     categorySlug: 'tools-reviews',
-    authorSlug: 'serhii-bondarenko',
+    authorSlug: 'iryna-hnatiuk',
     tagSlugs: ['tools', 'devops', 'railway']
   }
 ];
@@ -276,7 +256,7 @@ export const articles = articleSeeds.map((seed, index) => ({
   publishedAt: publishedDates[index],
   updatedAt: publishedDates[index],
   views: 120 + index * 17,
-  metaTitle: `${seed.title} | IT Blog`,
+  metaTitle: seed.title,
   metaDescription: seed.excerpt
 }));
 
@@ -390,18 +370,17 @@ export function searchArticles(query) {
 }
 
 export const aboutData = {
-  title: 'Про нас | StackVarta',
+  title: 'Про нас',
   name: 'StackVarta',
-  description: 'Сучасний технічний медіа-ресурс, присвячений архітектурі програмного забезпечення, DevOps-практикам та впровадженню AI в розробку. Ми пишемо для української IT-спільноти: від студентів, які роблять перші кроки в коді, до досвідчених інженерів, які шукають глибоку аналітику та перевірені технічні рішення.',
-  mission: 'Спрощувати складне. Ми прагнемо стати надійною точкою опори для розробників, надаючи контент, який економить час на налагодження та допомагає будувати безпечні, швидкі й масштабовані системи.',
-  foundedAt: 'Запуск',
-  foundedNote: 'Проєкт офіційно запущено в лютому 2026 року як незалежну ініціативу в межах освітнього курсу з SEO-оптимізації та просування.',
+  description:
+    'Сучасний технічний медіа-ресурс, присвячений архітектурі програмного забезпечення, DevOps-практикам та впровадженню AI в розробку. Ми пишемо для української IT-спільноти: від студентів, які роблять перші кроки в коді, до досвідчених інженерів, які шукають глибоку аналітику та перевірені технічні рішення.',
+  mission:
+    'Спрощувати складне. Ми прагнемо стати надійною точкою опори для розробників, надаючи контент, який економить час на налагодження та допомагає будувати безпечні, швидкі й масштабовані системи.',
   contacts: {
     email: 'stackvarta@gmail.com'
   },
-  socialLinks: [
-    { name: 'GitHub', url: 'https://github.com/xsour/StackNova' }
-  ]
+  foundedDate: '2026-02-01',
+  socialLinks: [{ name: 'GitHub', url: 'https://github.com/xsour/StackNova' }]
 };
 
 export function getAboutData() {

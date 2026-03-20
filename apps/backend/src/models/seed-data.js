@@ -241,7 +241,7 @@ const articles = articleSeeds.map((seed, index) => ({
   ].join('\n\n'),
   cover_url: '/placeholder-cover.svg',
   views: 120 + index * 17,
-  meta_title: `${seed.title} | IT Blog`,
+  meta_title: seed.title,
   meta_description: seed.excerpt,
   status: 'published',
   published_at: publishedDates[index]

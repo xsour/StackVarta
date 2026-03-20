@@ -10,6 +10,7 @@ const { createSlug } = require('../utils/slug');
 
 const MIGRATION_PATH = path.join(__dirname, '..', '..', 'migrations', '001_init.sql');
 const MIGRATION_PATH_002 = path.join(__dirname, '..', '..', 'migrations', '002_authors_and_site_settings.sql');
+const MIGRATION_PATH_003 = path.join(__dirname, '..', '..', 'migrations', '003_align_brand_and_metadata.sql');
 
 let pool;
 let dbMode = 'memory';
@@ -275,8 +276,12 @@ async function query(text, params = []) {
 async function runMigrations() {
   const sql = await fs.readFile(MIGRATION_PATH, 'utf8');
   await pool.query(sql);
+
   const sql002 = await fs.readFile(MIGRATION_PATH_002, 'utf8');
   await pool.query(sql002);
+
+  const sql003 = await fs.readFile(MIGRATION_PATH_003, 'utf8');
+  await pool.query(sql003);
 }
 
 async function seedIfNeeded() {

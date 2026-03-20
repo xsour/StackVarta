@@ -2,12 +2,13 @@ import { notFound } from 'next/navigation';
 
 import ArticleCard from '../../../components/ArticleCard';
 import Pagination from '../../../components/Pagination';
-import { getTagPageData } from '../../../lib/api';
-import { tags } from '../../../lib/mock-data';
+import { getTagPageData, getTags } from '../../../lib/api';
+import { siteConfig } from '../../../lib/site-config';
 
 export const revalidate = 300;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const tags = await getTags();
   return tags.map((tag) => ({ slug: tag.slug }));
 }
 
@@ -26,6 +27,11 @@ export async function generateMetadata(props) {
     description: `Список статей з тегом ${tag.name}`,
     alternates: {
       canonical: `/tags/${tag.slug}`
+    },
+    openGraph: {
+      title: `Тег: ${tag.name} | ${siteConfig.name}`,
+      description: `Список статей з тегом ${tag.name}`,
+      url: `/tags/${tag.slug}`
     }
   };
 }

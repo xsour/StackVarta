@@ -1,13 +1,45 @@
-function normalizeUrl(rawValue, fallback) {
-  try {
-    return new URL(rawValue || fallback).toString().replace(/\/$/, '');
-  } catch {
-    return fallback;
+function getUrlCandidates(rawValue) {
+  return String(rawValue || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeUrl(rawValue, fallback, { preferCustomDomain = false } = {}) {
+  const fallbackValue = new URL(fallback).toString().replace(/\/$/, '');
+  const candidates = getUrlCandidates(rawValue);
+  const validUrls = candidates
+    .map((item) => {
+      try {
+        return new URL(item).toString().replace(/\/$/, '');
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+
+  if (!validUrls.length) {
+    return fallbackValue;
   }
+
+  if (preferCustomDomain) {
+    const preferred = validUrls.find((item) => {
+      const hostname = new URL(item).hostname;
+      return !hostname.endsWith('.up.railway.app') && hostname !== 'localhost' && hostname !== '127.0.0.1';
+    });
+
+    if (preferred) {
+      return preferred;
+    }
+  }
+
+  return validUrls[0];
 }
 
 export function getSiteBaseUrl() {
-  return normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL, 'http://localhost:3000');
+  return normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL, 'http://localhost:3000', {
+    preferCustomDomain: true
+  });
 }
 
 export function getApiBaseUrl() {
@@ -41,7 +73,7 @@ export function toAbsoluteImageUrl(imageUrl) {
 }
 
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || 'IT Blog',
+  name: process.env.NEXT_PUBLIC_SITE_NAME || 'StackVarta',
   baseUrl: getSiteBaseUrl(),
   apiBaseUrl: getApiBaseUrl(),
   description:
