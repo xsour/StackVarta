@@ -6,7 +6,7 @@ import Pagination from '../../../components/Pagination';
 import { getAuthorPageData, getAuthors } from '../../../lib/api';
 import { siteConfig } from '../../../lib/site-config';
 
-export const revalidate = 86400;
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   const authors = await getAuthors();

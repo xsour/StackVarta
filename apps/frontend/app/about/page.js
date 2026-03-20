@@ -13,15 +13,31 @@ function parseDisplayDate(value) {
   return new Date(value);
 }
 
-function formatFoundedDate(value) {
+function formatLaunchNote(value) {
+  if (!value) return '';
+
   const parsedDate = parseDisplayDate(value);
   if (!parsedDate || Number.isNaN(parsedDate.getTime())) return '';
 
-  return new Intl.DateTimeFormat('uk-UA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(parsedDate);
+  const monthNames = [
+    'січні',
+    'лютому',
+    'березні',
+    'квітні',
+    'травні',
+    'червні',
+    'липні',
+    'серпні',
+    'вересні',
+    'жовтні',
+    'листопаді',
+    'грудні'
+  ];
+
+  const monthName = monthNames[parsedDate.getMonth()] || '';
+  const year = parsedDate.getFullYear();
+
+  return `Проєкт офіційно запущено в ${monthName} ${year} року як незалежну ініціативу в межах освітнього курсу з SEO-оптимізації та просування.`;
 }
 
 export async function generateMetadata() {
@@ -40,6 +56,8 @@ export default async function AboutPage() {
   const data = await getAboutPageData();
   const email = data?.contacts?.email || '';
   const socialLinks = Array.isArray(data?.socialLinks) ? data.socialLinks : [];
+  const foundedLabel = data?.foundedAt || (data?.foundedDate ? 'Запуск' : '');
+  const foundedNote = data?.foundedNote || formatLaunchNote(data?.foundedDate);
 
   return (
     <main className="container page">
@@ -85,23 +103,27 @@ export default async function AboutPage() {
         )}
       </section>
 
-      {data.foundedDate ? (
-        <section className="panel section-spacer" style={{ borderStyle: 'dashed', opacity: 0.8 }}>
+      {(foundedLabel || foundedNote) ? (
+        <section className="panel section-spacer about-launch-panel" style={{ borderStyle: 'dashed', opacity: 0.9 }}>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline', flexWrap: 'wrap' }}>
-            <span
-              style={{
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: 'var(--accent)',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase'
-              }}
-            >
-              Дата заснування
-            </span>
-            <p className="muted" style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
-              {formatFoundedDate(data.foundedDate)}
-            </p>
+            {foundedLabel ? (
+              <span
+                style={{
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  color: 'var(--accent)',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase'
+                }}
+              >
+                {foundedLabel}
+              </span>
+            ) : null}
+            {foundedNote ? (
+              <p className="muted" style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
+                {foundedNote}
+              </p>
+            ) : null}
           </div>
         </section>
       ) : null}

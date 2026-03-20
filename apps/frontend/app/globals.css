@@ -595,3 +595,115 @@ strong {
     align-items: stretch;
   }
 }
+
+select.input,
+textarea.input,
+.input[type="file"] {
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+}
+
+.admin-grid {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: start;
+}
+
+.admin-card,
+.admin-shell,
+.admin-list-item,
+.admin-list-item > div,
+.section-heading > div,
+.article-admin-list,
+.author-top > div {
+  min-width: 0;
+}
+
+.admin-card {
+  overflow: hidden;
+}
+
+.upload-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.upload-box .field,
+.admin-actions,
+.inline-list {
+  min-width: 0;
+}
+
+.admin-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.admin-list-item p,
+.admin-list-item h3,
+.author-box p,
+.hero p,
+.panel p {
+  overflow-wrap: anywhere;
+}
+
+.admin-actions {
+  display: grid;
+  gap: 12px;
+  justify-content: stretch;
+  align-items: stretch;
+  width: min(170px, 100%);
+}
+
+.admin-actions .button {
+  width: 100%;
+  min-width: 0;
+}
+
+.article-admin-list .admin-list-item {
+  gap: 20px;
+}
+
+.compact-list {
+  overflow-x: hidden;
+}
+
+.input,
+.button {
+  width: 100%;
+}
+
+.button-secondary,
+.button-danger {
+  width: auto;
+}
+
+.admin-toolbar .inline-list,
+.section-heading .button,
+.admin-actions {
+  width: auto;
+}
+
+@media (max-width: 1180px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .upload-box,
+  .admin-list-item {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-actions .button,
+  .button-secondary,
+  .button-danger {
+    width: 100%;
+  }
+}
