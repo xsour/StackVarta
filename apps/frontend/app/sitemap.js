@@ -11,6 +11,10 @@ export default async function sitemap() {
       url: `${baseUrl}/`,
       lastModified: now
     },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now
+    },
     ...categories.map((category) => ({
       url: `${baseUrl}/categories/${category.slug}`,
       lastModified: now
