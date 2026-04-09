@@ -1,0 +1,23 @@
+{
+  "name": "it-blog",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n frontend,backend \"npm run dev --workspace @it-blog/frontend\" \"npm run dev --workspace @it-blog/backend\"",
+    "dev:frontend": "npm run dev --workspace @it-blog/frontend",
+    "dev:backend": "npm run dev --workspace @it-blog/backend",
+    "build": "npm run build --workspace @it-blog/frontend",
+    "start:frontend": "npm run start --workspace @it-blog/frontend",
+    "start:backend": "npm run start --workspace @it-blog/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

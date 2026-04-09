@@ -1,0 +1,29 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900' role='img' aria-labelledby='title desc'>
+  <title id='title'>Admin і noindex</title>
+  <desc id='desc'>robots.txt, noindex і службові URL</desc>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#1f2937' />
+      <stop offset='100%' stop-color='#14b8a6' />
+    </linearGradient>
+    <linearGradient id='glass' x1='0' y1='0' x2='1' y2='0'>
+      <stop offset='0%' stop-color='rgba(255,255,255,0.18)' />
+      <stop offset='100%' stop-color='rgba(255,255,255,0.04)' />
+    </linearGradient>
+  </defs>
+  <rect width='1600' height='900' fill='url(#bg)' rx='32' />
+  <circle cx='1290' cy='170' r='210' fill='rgba(255,255,255,0.08)' />
+  <circle cx='1430' cy='720' r='170' fill='rgba(255,255,255,0.08)' />
+  <rect x='56' y='60' width='1488' height='780' rx='28' fill='rgba(8,17,31,0.24)' stroke='rgba(255,255,255,0.18)' />
+  <text x='72' y='154' font-size='26' font-family='Inter, Arial, sans-serif' fill='rgba(255,255,255,0.78)' letter-spacing='4'>STACKVARTA</text>
+  <text x='72' y='320' font-size='72' font-weight='800' font-family='Inter, Arial, sans-serif' fill='white'><tspan x='72' dy='0'>Admin і noindex</tspan></text>
+  <text x='72' y='510' font-size='34' font-family='Inter, Arial, sans-serif' fill='rgba(255,255,255,0.86)'><tspan x='72' dy='0'>robots.txt, noindex і службові URL</tspan></text>
+  <g transform='translate(980 250)'>
+    <rect x='0' y='0' width='420' height='250' rx='24' fill='rgba(255,255,255,0.12)' />
+    <rect x='28' y='32' width='190' height='16' rx='8' fill='rgba(255,255,255,0.32)' />
+    <rect x='28' y='72' width='310' height='18' rx='9' fill='rgba(255,255,255,0.24)' />
+    <rect x='28' y='108' width='260' height='18' rx='9' fill='rgba(255,255,255,0.18)' />
+    <rect x='28' y='152' width='142' height='42' rx='21' fill='rgba(255,255,255,0.16)' />
+    <rect x='254' y='152' width='138' height='42' rx='21' fill='rgba(255,255,255,0.16)' />
+  </g>
+</svg>

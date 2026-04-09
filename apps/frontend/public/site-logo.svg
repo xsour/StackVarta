@@ -1,0 +1,12 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256' role='img' aria-labelledby='title desc'>
+  <title id='title'>StackVarta</title>
+  <desc id='desc'>Логотип StackVarta</desc>
+  <defs>
+    <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#2563eb'/>
+      <stop offset='100%' stop-color='#14b8a6'/>
+    </linearGradient>
+  </defs>
+  <rect width='256' height='256' rx='56' fill='#0b1220'/>
+  <path d='M64 82h128l-22 30H86l18 26h68l20 28H64l22-30h84l-18-26H64z' fill='url(#g)'/>
+</svg>

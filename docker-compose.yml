@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: it-blog-postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-it_blog}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    environment:
+      PORT: ${BACKEND_PORT:-4000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-it_blog}
+      DATABASE_SSL: "false"
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-change-me}
+      API_BASE_URL: http://localhost:${BACKEND_PORT:-4000}
+      CORS_ORIGIN: http://localhost:${FRONTEND_PORT:-3000}
+    volumes:
+      - ./apps/backend:/app
+    depends_on:
+      - postgres
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      PORT: ${FRONTEND_PORT:-3000}
+      NEXT_PUBLIC_SITE_URL: http://localhost:${FRONTEND_PORT:-3000}
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:${BACKEND_PORT:-4000}
+      NEXT_PUBLIC_SITE_NAME: IT Blog
+    volumes:
+      - ./apps/frontend:/app
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
