@@ -1,16 +1,18 @@
-const db = require('../models/mock-db');
+const store = require('../models/store');
 const { sendData, sendError, sendList } = require('../utils/response');
 
-function listArticles(req, res) {
-  const page = Number(req.query.page || 1);
-  const perPage = Number(req.query.perPage || 10);
-  const category = req.query.category || '';
-  const result = db.getArticles({ page, perPage, category });
+async function listArticles(req, res) {
+  const result = await store.listArticles({
+    page: req.query.page,
+    perPage: req.query.perPage,
+    category: req.query.category
+  });
+
   return sendList(res, result.data, result.meta);
 }
 
-function getArticle(req, res) {
-  const article = db.getArticleBySlug(req.params.slug);
+async function getArticle(req, res) {
+  const article = await store.getArticleBySlug(req.params.slug);
   if (!article) {
     return sendError(res, 404, 'NOT_FOUND', 'Article not found');
   }
@@ -18,17 +20,17 @@ function getArticle(req, res) {
   return sendData(res, article);
 }
 
-function getRelated(req, res) {
-  const article = db.getArticleBySlug(req.params.slug);
-  if (!article) {
+async function getRelated(req, res) {
+  const relatedArticles = await store.getRelatedArticles(req.params.slug, req.query.limit || 3);
+  if (!relatedArticles) {
     return sendError(res, 404, 'NOT_FOUND', 'Article not found');
   }
 
-  return sendData(res, db.getRelatedArticles(req.params.slug));
+  return sendData(res, relatedArticles);
 }
 
-function incrementView(req, res) {
-  const article = db.incrementViews(Number(req.params.id));
+async function incrementView(req, res) {
+  const article = await store.incrementArticleViews(req.params.id);
   if (!article) {
     return sendError(res, 404, 'NOT_FOUND', 'Article not found');
   }

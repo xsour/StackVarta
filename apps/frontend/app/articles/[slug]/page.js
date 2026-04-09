@@ -32,8 +32,10 @@ export async function generateMetadata(props) {
     };
   }
 
+  const pageTitle = getPageTitle(article);
+
   return {
-    title: article.metaTitle || article.title,
+    title: pageTitle,
     description: article.metaDescription || article.excerpt,
     alternates: {
       canonical: `/articles/${article.slug}`
@@ -209,6 +211,40 @@ export default async function ArticlePage(props) {
               <div className="article-dates muted">
                 <span><strong>Опубліковано:</strong> {formatDate(article.publishedAt)}</span>
                 <span><strong>Оновлено:</strong> {formatDate(article.updatedAt || article.publishedAt)}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel section-spacer author-signature">
+          <div className="author-top" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            {article.author?.avatarUrl && (
+              <Image
+                src={article.author.avatarUrl}
+                alt={article.author.name}
+                width={80}
+                height={80}
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+              />
+            )}
+            <div>
+              <p className="eyebrow" style={{ marginBottom: '4px' }}>Автор матеріалу</p>
+              <h3 style={{ margin: 0 }}>
+                <Link href={`/authors/${article.author?.slug}`} style={{ color: 'var(--accent)' }}>
+                  {article.author?.fullName || article.author?.name}
+                </Link>
+              </h3>
+              <p className="muted" style={{ marginTop: '8px', fontSize: '0.95rem' }}>
+                {article.author?.bio}
+              </p>
+              <div className="article-dates muted" style={{ marginTop: '12px', fontSize: '0.85rem', display: 'flex', gap: '16px' }}>
+                <span><strong>Опубліковано:</strong> {formatDate(article.publishedAt)}</span>
+                {article.updatedAt && article.updatedAt !== article.publishedAt && (
+                  <span><strong>Оновлено:</strong> {formatDate(article.updatedAt)}</span>
+                )}
+                {(!article.updatedAt || article.updatedAt === article.publishedAt) && (
+                  <span><strong>Оновлено:</strong> {formatDate(article.publishedAt)}</span>
+                )}
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const store = require('../models/store');
 
 const router = Router();
 
@@ -7,6 +8,7 @@ router.get('/', (req, res) => {
     data: {
       status: 'ok',
       service: 'backend',
+      database: store.getDbMode(),
       timestamp: new Date().toISOString()
     }
   });

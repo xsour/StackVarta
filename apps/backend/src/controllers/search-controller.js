@@ -1,8 +1,12 @@
-const db = require('../models/mock-db');
+const store = require('../models/store');
 const { sendList } = require('../utils/response');
 
-function search(req, res) {
-  const result = db.searchArticles(req.query.q || '');
+async function search(req, res) {
+  const result = await store.searchArticles(req.query.q || '', {
+    page: req.query.page,
+    perPage: req.query.perPage
+  });
+
   return sendList(res, result.data, result.meta);
 }
 

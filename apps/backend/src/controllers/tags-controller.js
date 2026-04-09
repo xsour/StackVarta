@@ -1,14 +1,24 @@
-const db = require('../models/mock-db');
+const store = require('../models/store');
 const { sendData, sendError, sendList } = require('../utils/response');
 
-function listTags(req, res) {
-  return sendData(res, db.getTags());
+async function listTags(req, res) {
+  const tags = await store.getTags();
+  return sendData(res, tags);
 }
 
-function tagArticles(req, res) {
-  const result = db.getArticlesByTag(req.params.slug, {
-    page: Number(req.query.page || 1),
-    perPage: Number(req.query.perPage || 10)
+async function getTag(req, res) {
+  const tag = await store.getTagBySlug(req.params.slug);
+  if (!tag) {
+    return sendError(res, 404, 'NOT_FOUND', 'Tag not found');
+  }
+
+  return sendData(res, tag);
+}
+
+async function tagArticles(req, res) {
+  const result = await store.getArticlesByTag(req.params.slug, {
+    page: req.query.page,
+    perPage: req.query.perPage
   });
 
   if (!result) {
@@ -20,5 +30,6 @@ function tagArticles(req, res) {
 
 module.exports = {
   listTags,
+  getTag,
   tagArticles
 };

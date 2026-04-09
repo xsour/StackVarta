@@ -1,14 +1,24 @@
-const db = require('../models/mock-db');
+const store = require('../models/store');
 const { sendData, sendError, sendList } = require('../utils/response');
 
-function listCategories(req, res) {
-  return sendData(res, db.getCategories());
+async function listCategories(req, res) {
+  const categories = await store.getCategories();
+  return sendData(res, categories);
 }
 
-function categoryArticles(req, res) {
-  const result = db.getArticlesByCategory(req.params.slug, {
-    page: Number(req.query.page || 1),
-    perPage: Number(req.query.perPage || 10)
+async function getCategory(req, res) {
+  const category = await store.getCategoryBySlug(req.params.slug);
+  if (!category) {
+    return sendError(res, 404, 'NOT_FOUND', 'Category not found');
+  }
+
+  return sendData(res, category);
+}
+
+async function categoryArticles(req, res) {
+  const result = await store.getArticlesByCategory(req.params.slug, {
+    page: req.query.page,
+    perPage: req.query.perPage
   });
 
   if (!result) {
@@ -20,5 +30,6 @@ function categoryArticles(req, res) {
 
 module.exports = {
   listCategories,
+  getCategory,
   categoryArticles
 };

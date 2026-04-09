@@ -212,7 +212,7 @@ const articles = articleSeeds.map((seed, index) => ({
   category_id: categoryBySlug.get(seed.categorySlug).id,
   status: 'published',
   views: 100 + index * 13,
-  meta_title: `${seed.title} | IT Blog`,
+  meta_title: seed.title,
   meta_description: seed.excerpt,
   published_at: publishedDates[index],
   created_at: publishedDates[index],

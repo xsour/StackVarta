@@ -1,5 +1,4 @@
--- Автори / користувачі
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
@@ -12,8 +11,7 @@ CREATE TABLE users
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Категорії
-CREATE TABLE categories
+CREATE TABLE IF NOT EXISTS categories
 (
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
@@ -22,8 +20,7 @@ CREATE TABLE categories
     created_at  TIMESTAMP DEFAULT NOW()
 );
 
--- Статті
-CREATE TABLE articles
+CREATE TABLE IF NOT EXISTS articles
 (
     id               SERIAL PRIMARY KEY,
     title            VARCHAR(300) NOT NULL,
@@ -42,8 +39,7 @@ CREATE TABLE articles
     updated_at       TIMESTAMP   DEFAULT NOW()
 );
 
--- Теги
-CREATE TABLE tags
+CREATE TABLE IF NOT EXISTS tags
 (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
@@ -51,17 +47,15 @@ CREATE TABLE tags
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Зв'язок статей та тегів (many-to-many)
-CREATE TABLE article_tags
+CREATE TABLE IF NOT EXISTS article_tags
 (
     article_id INTEGER REFERENCES articles (id) ON DELETE CASCADE,
     tag_id     INTEGER REFERENCES tags (id) ON DELETE CASCADE,
     PRIMARY KEY (article_id, tag_id)
 );
 
--- Індекси для швидкого пошуку
-CREATE INDEX idx_articles_slug ON articles (slug);
-CREATE INDEX idx_articles_status ON articles (status);
-CREATE INDEX idx_articles_category ON articles (category_id);
-CREATE INDEX idx_articles_author ON articles (author_id);
-CREATE INDEX idx_articles_published ON articles (published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles (slug);
+CREATE INDEX IF NOT EXISTS idx_articles_status ON articles (status);
+CREATE INDEX IF NOT EXISTS idx_articles_category ON articles (category_id);
+CREATE INDEX IF NOT EXISTS idx_articles_author ON articles (author_id);
+CREATE INDEX IF NOT EXISTS idx_articles_published ON articles (published_at DESC);
