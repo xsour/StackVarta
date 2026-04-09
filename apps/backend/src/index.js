@@ -34,7 +34,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.get('/', (req, res) => {
   res.json({
     data: {
-      service: 'IT Blog API',
+      service: 'StackVarta API',
       database: store.getDbMode(),
       docs: [
         '/api/health',

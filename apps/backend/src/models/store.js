@@ -10,6 +10,8 @@ const { createSlug } = require('../utils/slug');
 
 const MIGRATION_PATH = path.join(__dirname, '..', '..', 'migrations', '001_init.sql');
 const MIGRATION_PATH_002 = path.join(__dirname, '..', '..', 'migrations', '002_authors_and_site_settings.sql');
+const MIGRATION_PATH_003 = path.join(__dirname, '..', '..', 'migrations', '003_align_brand_and_metadata.sql');
+const MIGRATION_PATH_004 = path.join(__dirname, '..', '..', 'migrations', '004_refresh_seed_for_lab2.sql');
 
 let pool;
 let dbMode = 'memory';
@@ -275,8 +277,15 @@ async function query(text, params = []) {
 async function runMigrations() {
   const sql = await fs.readFile(MIGRATION_PATH, 'utf8');
   await pool.query(sql);
+
   const sql002 = await fs.readFile(MIGRATION_PATH_002, 'utf8');
   await pool.query(sql002);
+
+  const sql003 = await fs.readFile(MIGRATION_PATH_003, 'utf8');
+  await pool.query(sql003);
+
+  const sql004 = await fs.readFile(MIGRATION_PATH_004, 'utf8');
+  await pool.query(sql004);
 }
 
 async function seedIfNeeded() {
@@ -1188,19 +1197,52 @@ async function listAuthors() {
   return getAuthors();
 }
 
+function buildFoundedNote(value) {
+  if (!value) return null;
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const monthNames = [
+    'січні',
+    'лютому',
+    'березні',
+    'квітні',
+    'травні',
+    'червні',
+    'липні',
+    'серпні',
+    'вересні',
+    'жовтні',
+    'листопаді',
+    'грудні'
+  ];
+
+  const monthName = monthNames[date.getMonth()] || '';
+  const year = date.getFullYear();
+  return `Проєкт офіційно запущено в ${monthName} ${year} року як незалежну ініціативу в межах освітнього курсу з SEO-оптимізації та просування.`;
+}
+
 function mapSiteSettingsRow(row) {
   if (!row) return null;
+
+  const foundedDate = row.founded_date
+    ? (row.founded_date instanceof Date
+        ? row.founded_date.toISOString().slice(0, 10)
+        : String(row.founded_date).slice(0, 10))
+    : null;
+
   return {
     title: row.title,
     name: row.name,
     description: row.description,
     mission: row.mission,
     contacts: { email: row.contact_email },
-    foundedDate: row.founded_date
-        ? (row.founded_date instanceof Date
-            ? row.founded_date.toISOString().slice(0, 10)
-            : String(row.founded_date).slice(0, 10))
-        : null,
+    foundedDate,
+    foundedAt: foundedDate ? 'Запуск' : null,
+    foundedNote: foundedDate ? buildFoundedNote(foundedDate) : null,
     socialLinks: Array.isArray(row.social_links) ? row.social_links : (row.social_links ? JSON.parse(row.social_links) : []),
     updatedAt: row.updated_at
   };

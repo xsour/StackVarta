@@ -1,4 +1,4 @@
-import { siteConfig } from '../lib/mock-data';
+import { siteConfig } from '../lib/site-config';
 
 export default function robots() {
   return {
@@ -6,7 +6,7 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        disallow: '/admin'
+        disallow: ['/admin', '/api/admin', '/api/auth']
       }
     ],
     sitemap: `${siteConfig.baseUrl}/sitemap.xml`,
