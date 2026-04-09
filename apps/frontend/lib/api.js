@@ -12,8 +12,11 @@ import {
   getRelatedArticles as getFallbackRelatedArticles,
   getTagBySlug as getFallbackTagBySlug,
   searchArticles as searchFallbackArticles,
-  tags as fallbackTags
+  tags as fallbackTags,
+  getAboutData as getFallbackAboutData,
+  getArticleCountByAuthor as getFallbackArticleCountByAuthor
 } from './mock-data';
+import { enhanceArticle, enhanceArticles } from './article-seo';
 import { getApiBaseUrl } from './site-config';
 
 class ApiHttpError extends Error {
@@ -109,14 +112,14 @@ export async function getHomePageData({ page = 1, category = '' } = {}) {
     ]);
 
     return {
-      items: articlesPayload.data,
+      items: enhanceArticles(articlesPayload.data),
       meta: articlesPayload.meta,
       categories
     };
   } catch {
     const { items, meta } = getFallbackHomepageData({ page, category });
     return {
-      items,
+      items: enhanceArticles(items),
       meta,
       categories: fallbackCategories
     };
@@ -131,8 +134,8 @@ export async function getArticlePageData(slug) {
     ]);
 
     return {
-      article: articlePayload.data,
-      relatedArticles: relatedPayload.data
+      article: enhanceArticle(articlePayload.data),
+      relatedArticles: enhanceArticles(relatedPayload.data)
     };
   } catch (error) {
     if (isNotFoundError(error)) {
@@ -151,8 +154,8 @@ export async function getArticlePageData(slug) {
     }
 
     return {
-      article: fallbackArticle,
-      relatedArticles: getFallbackRelatedArticles(slug, 3)
+      article: enhanceArticle(fallbackArticle),
+      relatedArticles: enhanceArticles(getFallbackRelatedArticles(slug, 3))
     };
   }
 }
@@ -166,7 +169,7 @@ export async function getCategoryPageData(slug, { page = 1 } = {}) {
 
     return {
       category: categoryPayload.data,
-      items: articlesPayload.data,
+      items: enhanceArticles(articlesPayload.data),
       meta: articlesPayload.meta
     };
   } catch (error) {
@@ -188,7 +191,7 @@ export async function getCategoryPageData(slug, { page = 1 } = {}) {
     }
 
     const { items, meta } = getFallbackArticlesByCategory(slug, { page, perPage: 10 });
-    return { category, items, meta };
+    return { category, items: enhanceArticles(items), meta };
   }
 }
 
@@ -201,7 +204,7 @@ export async function getAuthorPageData(slug, { page = 1 } = {}) {
 
     return {
       author: authorPayload.data,
-      items: articlesPayload.data,
+      items: enhanceArticles(articlesPayload.data),
       meta: articlesPayload.meta
     };
   } catch (error) {
@@ -223,7 +226,8 @@ export async function getAuthorPageData(slug, { page = 1 } = {}) {
     }
 
     const { items, meta } = getFallbackArticlesByAuthor(slug, { page, perPage: 10 });
-    return { author, items, meta };
+    const totalArticles = getFallbackArticleCountByAuthor(slug);
+    return { author: { ...author, totalArticles }, items: enhanceArticles(items), meta };
   }
 }
 
@@ -236,7 +240,7 @@ export async function getTagPageData(slug, { page = 1 } = {}) {
 
     return {
       tag: tagPayload.data,
-      items: articlesPayload.data,
+      items: enhanceArticles(articlesPayload.data),
       meta: articlesPayload.meta
     };
   } catch (error) {
@@ -258,7 +262,7 @@ export async function getTagPageData(slug, { page = 1 } = {}) {
     }
 
     const { items, meta } = getFallbackArticlesByTag(slug, { page, perPage: 10 });
-    return { tag, items, meta };
+    return { tag, items: enhanceArticles(items), meta };
   }
 }
 
@@ -273,18 +277,18 @@ export async function getSearchResults(query) {
       revalidate: 0,
       cache: 'no-store'
     });
-    return payload.data;
+    return enhanceArticles(payload.data);
   } catch {
-    return searchFallbackArticles(normalizedQuery);
+    return enhanceArticles(searchFallbackArticles(normalizedQuery));
   }
 }
 
 export async function getFeedArticles(limit = 50) {
   try {
     const payload = await requestJson(`/api/articles?page=1&perPage=${limit}`);
-    return payload.data;
+    return enhanceArticles(payload.data);
   } catch {
-    return getFallbackPublishedArticles().slice(0, limit);
+    return enhanceArticles(getFallbackPublishedArticles().slice(0, limit));
   }
 }
 
@@ -302,4 +306,13 @@ export async function getSitemapData() {
     tags,
     articles
   };
+}
+
+export async function getAboutPageData() {
+  try {
+    const payload = await requestJson('/api/about');
+    return payload.data;
+  } catch {
+    return getFallbackAboutData();
+  }
 }

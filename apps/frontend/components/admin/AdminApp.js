@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { siteConfig } from '../../lib/site-config';
 
 const EMPTY_LOGIN_FORM = {
-  email: 'oleh@example.com',
-  password: 'change-me'
+  email: '',
+  password: ''
 };
 
 function createArticleForm(categories = [], authors = []) {
@@ -101,8 +101,6 @@ export default function AdminApp() {
   const [articleForm, setArticleForm] = useState(createArticleForm());
   const [categoryForm, setCategoryForm] = useState(EMPTY_CATEGORY_FORM);
   const [tagForm, setTagForm] = useState(EMPTY_TAG_FORM);
-
-  const seedCreds = useMemo(() => 'Seed login: oleh@example.com / change-me', []);
 
   useEffect(() => {
     const storedToken = window.localStorage.getItem('it-blog-admin-token') || '';
@@ -533,15 +531,16 @@ export default function AdminApp() {
         <p className="muted">
           Увійди через JWT-авторизацію, щоб керувати статтями, категоріями, тегами та авторами.
         </p>
-        <p className="message message-info">{seedCreds}</p>
         {error ? <p className="message message-error">{error}</p> : null}
         {message ? <p className="message message-success">{message}</p> : null}
-        <form onSubmit={handleLogin} className="admin-form stacked-form">
+        <form onSubmit={handleLogin} className="admin-form stacked-form" autoComplete="off">
           <label className="field">
             <span>Email</span>
             <input
               className="input"
               type="email"
+              autoComplete="off"
+              placeholder="Введіть email"
               value={loginForm.email}
               onChange={(event) => setLoginForm((current) => ({ ...current, email: event.target.value }))}
               required
@@ -552,6 +551,8 @@ export default function AdminApp() {
             <input
               className="input"
               type="password"
+              autoComplete="off"
+              placeholder="Введіть пароль"
               value={loginForm.password}
               onChange={(event) => setLoginForm((current) => ({ ...current, password: event.target.value }))}
               required
@@ -774,7 +775,7 @@ export default function AdminApp() {
               <p className="muted">Всі статті, включно з чернетками.</p>
             </div>
           </div>
-          <div className="admin-list">
+          <div className="admin-list article-admin-list">
             {articles.map((article) => (
               <article key={article.id} className="admin-list-item">
                 <div>
@@ -784,7 +785,7 @@ export default function AdminApp() {
                   </p>
                   <p className="muted">Опубліковано: {formatDateTime(article.publishedAt)}</p>
                 </div>
-                <div className="inline-list">
+                <div className="inline-list admin-actions">
                   <button className="button button-secondary" type="button" onClick={() => beginArticleEdit(article)}>
                     Редагувати
                   </button>
@@ -846,7 +847,7 @@ export default function AdminApp() {
                   <h3>{category.name}</h3>
                   <p className="muted">/{category.slug}</p>
                 </div>
-                <div className="inline-list">
+                <div className="inline-list admin-actions">
                   <button className="button button-secondary" type="button" onClick={() => beginCategoryEdit(category)}>
                     Редагувати
                   </button>
@@ -898,7 +899,7 @@ export default function AdminApp() {
                   <h3>{tag.name}</h3>
                   <p className="muted">#{tag.slug}</p>
                 </div>
-                <div className="inline-list">
+                <div className="inline-list admin-actions">
                   <button className="button button-secondary" type="button" onClick={() => beginTagEdit(tag)}>
                     Редагувати
                   </button>

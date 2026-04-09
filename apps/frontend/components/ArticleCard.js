@@ -1,26 +1,25 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat('uk-UA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(new Date(value));
+import { formatDate } from '../lib/date';
+
+function shouldBypassOptimization(src = '') {
+  return String(src).toLowerCase().endsWith('.svg');
 }
 
-export default function ArticleCard({ article }) {
+export default function ArticleCard({ article, priority = false }) {
   return (
     <article className="card">
       <Link href={`/articles/${article.slug}`} className="card-image-link">
         <Image
           src={article.coverUrl || '/placeholder-cover.svg'}
-          alt={article.title}
+          alt={article.coverAlt || article.title}
           width={960}
           height={540}
           className="card-image"
+          sizes="(max-width: 768px) 100vw, (max-width: 1120px) 50vw, 360px"
+          priority={priority}
+          unoptimized={shouldBypassOptimization(article.coverUrl)}
         />
       </Link>
 
@@ -44,7 +43,7 @@ export default function ArticleCard({ article }) {
 
         <div className="card-footer">
           {article.author ? <Link href={`/authors/${article.author.slug}`}>{article.author.name}</Link> : <span>Автор не вказаний</span>}
-          <span className="muted">{article.views ?? 0} переглядів</span>
+          <span className="muted">{article.readingTimeMinutes || 1} хв читання</span>
         </div>
       </div>
     </article>

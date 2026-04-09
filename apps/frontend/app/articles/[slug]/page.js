@@ -4,22 +4,22 @@ import { notFound } from 'next/navigation';
 
 import ArticleCard from '../../../components/ArticleCard';
 import ArticleViewTracker from '../../../components/ArticleViewTracker';
-import { getArticlePageData } from '../../../lib/api';
-import { getPublishedArticles } from '../../../lib/mock-data';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import RichArticleContent from '../../../components/RichArticleContent';
+import { getArticleBreadcrumbItems } from '../../../lib/article-seo';
+import { formatDate } from '../../../lib/date';
+import { getArticlePageData, getFeedArticles } from '../../../lib/api';
 import { siteConfig, toAbsoluteImageUrl, toAbsoluteUrl } from '../../../lib/site-config';
 
 export const revalidate = 60;
 
-export function generateStaticParams() {
-  return getPublishedArticles().map((article) => ({ slug: article.slug }));
+export async function generateStaticParams() {
+  const articles = await getFeedArticles(100);
+  return articles.map((article) => ({ slug: article.slug }));
 }
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat('uk-UA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(new Date(value));
+function shouldBypassOptimization(src = '') {
+  return String(src).toLowerCase().endsWith('.svg');
 }
 
 export async function generateMetadata(props) {
@@ -39,15 +39,17 @@ export async function generateMetadata(props) {
       canonical: `/articles/${article.slug}`
     },
     openGraph: {
-      title: article.metaTitle || article.title,
+      title: `${article.metaTitle || article.title} | ${siteConfig.name}`,
       description: article.metaDescription || article.excerpt,
-      url: `${siteConfig.baseUrl}/articles/${article.slug}`,
+      url: toAbsoluteUrl(`/articles/${article.slug}`),
       type: 'article',
       publishedTime: article.publishedAt,
+      modifiedTime: article.updatedAt || article.publishedAt,
+      authors: article.author?.name ? [article.author.name] : undefined,
       images: [
         {
           url: toAbsoluteImageUrl(article.coverUrl),
-          alt: article.title
+          alt: article.coverAlt || article.title
         }
       ]
     }
@@ -62,6 +64,7 @@ export default async function ArticlePage(props) {
     notFound();
   }
 
+  const breadcrumbs = getArticleBreadcrumbItems(article);
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -70,6 +73,7 @@ export default async function ArticlePage(props) {
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
     image: [toAbsoluteImageUrl(article.coverUrl)],
+    wordCount: article.wordCount,
     author: article.author
       ? {
           '@type': 'Person',
@@ -80,10 +84,41 @@ export default async function ArticlePage(props) {
     publisher: {
       '@type': 'Organization',
       name: siteConfig.name,
-      url: siteConfig.baseUrl
+      url: siteConfig.baseUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: toAbsoluteUrl('/site-logo.svg')
+      }
     },
-    mainEntityOfPage: toAbsoluteUrl(`/articles/${article.slug}`)
+    mainEntityOfPage: toAbsoluteUrl(`/articles/${article.slug}`),
+    inLanguage: 'uk'
   };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.label,
+      item: item.href ? toAbsoluteUrl(item.href) : toAbsoluteUrl(`/articles/${article.slug}`)
+    }))
+  };
+
+  const faqJsonLd = Array.isArray(article.faq) && article.faq.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: article.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+          }
+        }))
+      }
+    : null;
 
   return (
     <main className="container page narrow">
@@ -93,46 +128,90 @@ export default async function ArticlePage(props) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
-
-        <Image
-          src={article.coverUrl || '/placeholder-cover.svg'}
-          alt={article.title}
-          width={1200}
-          height={675}
-          className="article-cover"
-          priority
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
+        {faqJsonLd ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          />
+        ) : null}
 
-        <header className="article-header">
-          <div className="article-meta">
-            {article.category ? (
-              <Link href={`/categories/${article.category.slug}`} className="badge">
-                {article.category.name}
-              </Link>
+        <div className="article-header-shell">
+          <Breadcrumbs items={breadcrumbs} className="article-breadcrumbs" />
+
+          <Image
+            src={article.coverUrl || '/placeholder-cover.svg'}
+            alt={article.coverAlt || article.title}
+            width={1600}
+            height={900}
+            className="article-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, 760px"
+            unoptimized={shouldBypassOptimization(article.coverUrl)}
+          />
+
+          <header className="article-header">
+            <div className="article-meta">
+              {article.category ? (
+                <Link href={`/categories/${article.category.slug}`} className="badge">
+                  {article.category.name}
+                </Link>
+              ) : null}
+              <span className="muted">{formatDate(article.publishedAt)}</span>
+            </div>
+
+            <h1>{article.title}</h1>
+            {article.excerpt ? <p className="muted article-excerpt">{article.excerpt}</p> : null}
+
+            <div className="inline-list article-highlight-list">
+              {article.author ? (
+                <Link href={`/authors/${article.author.slug}`} className="pill">
+                  Автор: {article.author.name}
+                </Link>
+              ) : null}
+              {article.focusKeyword ? <span className="pill">Запит: {article.focusKeyword}</span> : null}
+              <span className="pill">{article.readingTimeMinutes || 1} хв читання</span>
+              <span className="pill">{article.wordCount || 0} слів</span>
+            </div>
+          </header>
+        </div>
+
+        <RichArticleContent article={article} />
+
+        <section className="panel section-spacer author-signature">
+          <div className="author-top author-featured">
+            {article.author?.avatarUrl ? (
+              <Image
+                src={article.author.avatarUrl}
+                alt={`Фото автора ${article.author.name}`}
+                width={96}
+                height={96}
+                sizes="96px"
+                className="author-avatar-large"
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+              />
             ) : null}
-            <span className="muted">{formatDate(article.publishedAt)}</span>
+            <div>
+              <p className="eyebrow" style={{ marginBottom: '4px' }}>Автор матеріалу</p>
+              <h2 className="author-card-title">
+                {article.author?.slug ? (
+                  <Link href={`/authors/${article.author.slug}`} className="link-accent">
+                    {article.author.fullName || article.author.name}
+                  </Link>
+                ) : (
+                  article.author?.fullName || article.author?.name
+                )}
+              </h2>
+              <p className="muted author-card-bio">{article.author?.bio}</p>
+              <div className="article-dates muted">
+                <span><strong>Опубліковано:</strong> {formatDate(article.publishedAt)}</span>
+                <span><strong>Оновлено:</strong> {formatDate(article.updatedAt || article.publishedAt)}</span>
+              </div>
+            </div>
           </div>
-
-          <h1>{article.title}</h1>
-          {article.excerpt ? <p className="muted">{article.excerpt}</p> : null}
-
-          <div className="inline-list">
-            {article.author ? (
-              <Link href={`/authors/${article.author.slug}`} className="pill">
-                Автор: {article.author.name}
-              </Link>
-            ) : null}
-            <span className="pill">Переглядів: {article.views}</span>
-          </div>
-        </header>
-
-        <section className="article-content prose">
-          {String(article.content || '')
-            .split('\n\n')
-            .filter(Boolean)
-            .map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
         </section>
 
         <section className="related-block">
@@ -151,7 +230,8 @@ export default async function ArticlePage(props) {
         </section>
 
         <section className="related-block">
-          <h2 className="section-title">Пов’язані статті</h2>
+          <h2 className="section-title">Схожі статті</h2>
+          <p className="muted related-copy">Автоматично підібрані матеріали з того самого силосу, щоб сторінка не залишалась ізольованою.</p>
           {relatedArticles.length ? (
             <div className="article-grid">
               {relatedArticles.map((related) => (
@@ -159,7 +239,7 @@ export default async function ArticlePage(props) {
               ))}
             </div>
           ) : (
-            <p className="muted">Пов’язаних статей поки немає.</p>
+            <p className="muted">Схожих статей поки немає.</p>
           )}
         </section>
       </article>
